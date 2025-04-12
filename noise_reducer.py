@@ -1,6 +1,8 @@
 import cv2
+import numpy as np
+from typing import Tuple
 
-def reduce_noise(image, strength=10, color_strength=10, template_window_size=7, search_window_size=21):
+def reduce_noise(image: np.ndarray, strength: int = 10, color_strength: int = 10, template_window_size: int = 7, search_window_size: int = 21) -> np.ndarray:
     """Reduces noise in a color image using cv2.fastNlMeansDenoisingColored.
 
     Args:
@@ -13,7 +15,7 @@ def reduce_noise(image, strength=10, color_strength=10, template_window_size=7, 
     Returns:
         NumPy array: The denoised image.
     """
-    denoised_image = cv2.fastNlMeansDenoisingColored(
+    denoised_image: np.ndarray = cv2.fastNlMeansDenoisingColored(
         image,
         None,
         strength,

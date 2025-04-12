@@ -1,8 +1,10 @@
 import cv2
 import glob
 import os
+import numpy as np
+from typing import List, Iterator
 
-def read_images_from_folder(folder_path):
+def read_images_from_folder(folder_path: str) -> List[np.ndarray]:
     """Reads image files (JPG, PNG) from the specified folder.
 
     Args:
@@ -12,7 +14,7 @@ def read_images_from_folder(folder_path):
         list: A list of images as NumPy arrays, or an empty list if no images
               are found or an error occurs.
     """
-    image_list = []
+    image_list: List[np.ndarray] = []
     supported_extensions = [".jpg", ".jpeg", ".png"]
     try:
         for ext in supported_extensions:
@@ -30,7 +32,7 @@ def read_images_from_folder(folder_path):
         print(f"Error accessing folder {folder_path}: {e}")
         return []
 
-def iterate_images(image_list):
+def iterate_images(image_list: List[np.ndarray]) -> Iterator[np.ndarray]:
     """Iterates through a list of images.
 
     Args:
