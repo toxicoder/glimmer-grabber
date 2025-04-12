@@ -3,23 +3,32 @@ import glob
 import os
 import numpy as np
 from typing import List, Iterator
+from config_manager import ConfigManager
 
-def read_images_from_folder(folder_path: str) -> List[np.ndarray]:
+def read_images_from_folder() -> List[np.ndarray]:
     """
-    Reads image files (JPG, JPEG, PNG) from the specified folder.
-
-    Args:
-        folder_path (str): The path to the folder containing the images.
+    Reads image files (JPG, JPEG, PNG) from the input directory specified in the configuration.
+    Handles crawling of subdirectories based on the configuration.
 
     Returns:
         List[np.ndarray]: A list of images as NumPy arrays.
                          Returns an empty list if no images are found or if an error occurs.
     """
+    config_manager = ConfigManager()
+    folder_path = config_manager.get_input_path()
+    crawl_subdirectories = config_manager.get_crawl_directories()
+
+    if not folder_path:
+        print("Error: Input directory not specified in configuration.")
+        return []
+
     image_list: List[np.ndarray] = []
     supported_extensions = [".jpg", ".jpeg", ".png"]
+    search_pattern = "**/*" if crawl_subdirectories else "*"
+
     try:
         for ext in supported_extensions:
-            for filename in glob.glob(os.path.join(folder_path, f"*{ext}")):
+            for filename in glob.glob(os.path.join(folder_path, f"{search_pattern}{ext}"), recursive=crawl_subdirectories):
                 try:
                     img = cv2.imread(filename)
                     if img is not None:

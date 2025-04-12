@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from typing import List, Dict, Any
+from config_manager import ConfigManager
 
 class CardSegmenter:
     """
@@ -31,11 +32,14 @@ class CardSegmenter:
             List[Dict[str, Any]]: A list of dictionaries, where each dictionary represents a card segmentation and contains:
                 - "mask" (np.ndarray): A binary mask representing the card segmentation.
                 - "bbox" (List[float]): A bounding box in the format [x1, y1, x2, y2].
+                - "image" (np.ndarray, optional): The segmented card image if keep_split_card_images is True.
             Returns an empty list if no cards are detected.
 
         Raises:
             Exception: If an error occurs during segmentation.
         """
+        config_manager = ConfigManager()
+        keep_split_card_images = config_manager.get_keep_split_card_images()
         try:
             results = self.model.predict(image)
             if results:
@@ -45,7 +49,12 @@ class CardSegmenter:
                 for i in range(len(masks)):
                     mask = masks[i]
                     bbox = boxes[i]
-                    segmentations.append({"mask": mask, "bbox": bbox})
+                    segmentation: Dict[str, Any] = {"mask": mask, "bbox": bbox}
+                    if keep_split_card_images:
+                        x1, y1, x2, y2 = map(int, bbox)
+                        segmented_image = image[y1:y2, x1:x2]
+                        segmentation["image"] = segmented_image
+                    segmentations.append(segmentation)
                 return segmentations
             else:
                 return []
