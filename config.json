@@ -1,6 +1,0 @@
-{
-  "input_path": "data/input",
-  "output_path": "data/output",
-  "threshold": 0.5,
-  "api_key": "your_api_key_here"
-}
