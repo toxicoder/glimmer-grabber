@@ -34,11 +34,12 @@ class TestHistoryLog(unittest.TestCase):
     def setUp(self):
         self.output_dir = "test_output"
         os.makedirs(self.output_dir, exist_ok=True)
-        self.history_file = os.path.join(self.output_dir, "processed_images.txt")
+        self.history_file = os.path.join("data", "processed_images.log")  # Updated history file path
 
     def tearDown(self):
         shutil.rmtree(self.output_dir)
-        if os.path.exists(self.history_file): # Handle cases where test may have failed before deleting
+        # Updated history file path and handling for potential non-existence
+        if os.path.exists(self.history_file):
             os.remove(self.history_file)
 
     @patch("os.path.exists", return_value=False)
@@ -61,7 +62,7 @@ class TestHistoryLog(unittest.TestCase):
         handle = mock_file()
         handle.write.assert_has_calls([call("image1.jpg\n"), call("image2.png\n")], any_order=False)
 
-    @patch("os.path.exists", side_effect=lambda path: path == os.path.join("test_output", "processed_images.txt"))  # Only history file exists
+    @patch("os.path.exists", side_effect=lambda path: path == os.path.join("data", "processed_images.log"))  # Updated path
     @patch("builtins.open", new_callable=mock_open, read_data="image1.jpg\n")  # "image1.jpg" already in history
     @patch("image_reader.read_images_from_folder", return_value=["image1.jpg", "image2.png"])
     def test_duplicate_skipping(self, mock_read_images, mock_file, mock_exists):
@@ -77,7 +78,7 @@ class TestHistoryLog(unittest.TestCase):
     @patch("builtins.open", new_callable=mock_open)
     @patch("image_reader.read_images_from_folder", return_value=["image3.jpg", "image4.png"])
     def test_history_file_in_data_dir(self, mock_read_images, mock_file, mock_exists):
-        history_file_path = os.path.join("data", "processed_images.txt")
+        history_file_path = os.path.join("data", "processed_images.log")  # Updated path
         config_manager = ConfigManager(cli_args={"output_dir": self.output_dir, "input_dir": "dummy_input"})
         with patch("main.config_manager", config_manager):
             main.main()
@@ -87,6 +88,41 @@ class TestHistoryLog(unittest.TestCase):
         file_calls = [call(history_file_path, 'r'), call(history_file_path, 'a')]
         mock_file.assert_has_calls(file_calls, any_order=True)
         handle.write.assert_has_calls([call("image3.jpg\n"), call("image4.png\n")], any_order=False)
+
+    def test_duplicate_imports_avoided(self):
+        # Create a dummy input directory with image files
+        input_dir = "test_input"
+        os.makedirs(input_dir, exist_ok=True)
+        image_files = ["image1.jpg", "image2.png"]
+        for image_file in image_files:
+            with open(os.path.join(input_dir, image_file), "w") as f:
+                f.write("dummy content")
+
+        # Run the application for the first time
+        config_manager = ConfigManager(cli_args={"input_dir": input_dir, "output_dir": self.output_dir})
+        with patch("main.config_manager", config_manager):
+            main.main()
+
+        # Check if the history file contains the image paths
+        history_file_path = os.path.join("data", "processed_images.log")
+        with open(history_file_path, "r") as f:
+            processed_images = [line.strip() for line in f]
+        expected_images = [os.path.abspath(os.path.join(input_dir, image_file)) for image_file in image_files]
+        self.assertEqual(processed_images, expected_images)
+
+        # Get the last modified timestamp of the history file
+        initial_timestamp = os.path.getmtime(history_file_path)
+
+        # Run the application for the second time
+        with patch("main.config_manager", config_manager):
+            main.main()
+
+        # Check if the history file remains unchanged
+        final_timestamp = os.path.getmtime(history_file_path)
+        self.assertEqual(initial_timestamp, final_timestamp)
+
+        # Clean up the dummy input directory
+        shutil.rmtree(input_dir)
 
 if __name__ == "__main__":
     unittest.main()
