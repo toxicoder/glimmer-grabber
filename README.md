@@ -33,6 +33,7 @@ glimmer-grabber offers a convenient and efficient way to digitize and manage Lor
 - Python 3.7 or higher
 - pip (Python package installer)
 
+
 ### Installation
 
 1. **Clone the repository:**
