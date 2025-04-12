@@ -1,8 +1,9 @@
 import json
+import json
 from typing import Optional, Any, Dict
+from .cli_args_parser import CLIArgsParser
 
 AppConfig = Dict[str, Any]
-CLIArgs = Optional[Dict[str, Any]]
 
 class ConfigManager:
     """Manages application configuration settings loaded from a JSON file,
@@ -10,22 +11,18 @@ class ConfigManager:
 
     Attributes:
         config: A dictionary holding the configuration settings.
-        cli_args: A dictionary holding the CLI arguments.
     """
-    def __init__(self, config_file: str = "config.json", cli_args: CLIArgs = None) -> None:
-        """Initializes the ConfigManager by loading settings from the specified JSON file
-        and updating them with CLI arguments.
+    def __init__(self, config_file: str = "config.json") -> None:  # Removed cli_args from here
+        """Initializes the ConfigManager by loading settings from the specified JSON file.
 
         Args:
             config_file: The path to the JSON configuration file. Defaults to "config.json".
-            cli_args: A dictionary of CLI arguments. Defaults to None.
 
         Raises:
             FileNotFoundError: If the configuration file does not exist.
             json.JSONDecodeError: If the configuration file contains invalid JSON.
         """
         self.config: AppConfig = {}
-        self.cli_args: AppConfig = {} if cli_args is None else cli_args
 
         try:
             with open(config_file, "r") as f:
@@ -35,29 +32,18 @@ class ConfigManager:
         except json.JSONDecodeError as e:
             raise json.JSONDecodeError(f"Invalid JSON format in configuration file: {e}", e.doc, e.pos)
 
-        self.update_with_cli_args(self.cli_args)
+        cli_args_parser = CLIArgsParser()  # Instantiate the CLIArgsParser
+        cli_config = cli_args_parser.parse_arguments()  # Parse and map CLI arguments
+        self.update_with_cli_args(cli_config)  # Update configuration with CLI arguments
 
-    def update_with_cli_args(self, cli_args: AppConfig) -> None:
+    def update_with_cli_args(self, cli_config: AppConfig) -> None:  # Modified this to use cli_config
         """Updates the configuration with values from CLI arguments, giving them priority.
 
         Args:
-            cli_args: A dictionary of CLI arguments.
+            cli_config: A dictionary of CLI arguments mapped to configuration keys.  # Modified this docstring
         """
-        # Map CLI argument names to config keys. Adjust as necessary to match your CLI arguments.
-        arg_mapping: Dict[str, str] = {
-            "input_dir": "input_path",
-            "output_dir": "output_path",  # Assuming you might add this CLI argument later
-            "threshold": "threshold",
-            "api_key": "api_key",
-            "keep_split_card_images": "keep_split_card_images",
-            "crawl_directories": "crawl_directories",
-            "save_segmented_images_path": "save_segmented_images_path",
-            "save_segmented_images": "save_segmented_images"
-        }
-
-        for arg_name, config_key in arg_mapping.items():
-            if arg_name in cli_args and cli_args[arg_name] is not None:
-                self.config[config_key] = cli_args[arg_name]
+        for key, value in cli_config.items():
+            self.config[key] = value
 
     def get_input_path(self) -> Optional[str]:
         """Retrieves the input path, prioritizing CLI arguments over the configuration file.
