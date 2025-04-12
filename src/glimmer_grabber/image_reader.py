@@ -2,7 +2,7 @@ import cv2
 import glob
 import os
 import numpy as np
-from typing import List, Iterator
+from typing import List, Iterator, Optional
 from .config_manager import ConfigManager
 
 def read_images_from_folder() -> List[np.ndarray]:
@@ -14,23 +14,23 @@ def read_images_from_folder() -> List[np.ndarray]:
         List[np.ndarray]: A list of images as NumPy arrays.
                          Returns an empty list if no images are found or if an error occurs.
     """
-    config_manager = ConfigManager()
-    folder_path = config_manager.get_input_path()
-    crawl_subdirectories = config_manager.get_crawl_directories()
+    config_manager: ConfigManager = ConfigManager()
+    folder_path: Optional[str] = config_manager.get_input_path()
+    crawl_subdirectories: Optional[bool] = config_manager.get_crawl_directories()
 
     if not folder_path:
         print("Error: Input directory not specified in configuration.")
         return []
 
     image_list: List[np.ndarray] = []
-    supported_extensions = [".jpg", ".jpeg", ".png"]
-    search_pattern = "**/*" if crawl_subdirectories else "*"
+    supported_extensions: List[str] = [".jpg", ".jpeg", ".png"]
+    search_pattern: str = "**/*" if crawl_subdirectories else "*"
 
     try:
         for ext in supported_extensions:
-            for filename in glob.glob(os.path.join(folder_path, f"{search_pattern}{ext}"), recursive=crawl_subdirectories):
+            for filename in glob.glob(os.path.join(folder_path, f"{search_pattern}{ext}"), recursive=bool(crawl_subdirectories)):
                 try:
-                    img = cv2.imread(filename)
+                    img: Optional[np.ndarray] = cv2.imread(filename)
                     if img is not None:
                         image_list.append(img)
                     else:

@@ -1,9 +1,10 @@
 import unittest
-from config_manager import ConfigManager
+from typing import Optional
+from glimmer_grabber.config_manager import ConfigManager
 
 class TestConfigManager(unittest.TestCase):
-    def test_config_values(self):
-        config_manager = ConfigManager()
+    def test_config_values(self) -> None:
+        config_manager: ConfigManager = ConfigManager()
         self.assertEqual(config_manager.get_input_path(), "data/input")
         self.assertEqual(config_manager.get_output_path(), "data/output")
         self.assertEqual(config_manager.get_threshold(), 0.5)

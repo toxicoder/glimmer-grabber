@@ -5,6 +5,8 @@ from src.utils.grayscale_converter import convert_to_grayscale
 import numpy as np
 from typing import Dict, Any
 
+PreprocessingConfig = Dict[str, Dict[str, Any]]
+
 class ImagePreprocessor:
     """
     Preprocesses images by applying a series of transformations based on a configuration.
@@ -13,7 +15,7 @@ class ImagePreprocessor:
         config (Dict[str, Any]): A dictionary containing the preprocessing configuration.
         steps (Dict[str, Any]): A dictionary mapping preprocessing step names to their corresponding functions.
     """
-    def __init__(self, config: Dict[str, Any]) -> None:
+    def __init__(self, config: PreprocessingConfig) -> None:
         """
         Initializes the ImagePreprocessor with a configuration.
 
@@ -21,7 +23,7 @@ class ImagePreprocessor:
             config (Dict[str, Any]): A dictionary containing the preprocessing configuration.
                                      The configuration should define the steps to be applied and their parameters.
         """
-        self.config = config
+        self.config: PreprocessingConfig = config
         self.steps = {
             "noise_reduction": reduce_noise,
             "illumination_normalization": normalize_illumination,
@@ -38,7 +40,8 @@ class ImagePreprocessor:
         Returns:
             np.ndarray: The preprocessed image as a NumPy array.
         """
-        for step_name, params in self.config.get("steps", {}).items():
+        steps: Dict[str, Dict[str, Any]] = self.config.get("steps", {})
+        for step_name, params in steps.items():
             if step_name in self.steps:
                 if step_name == "noise_reduction":
                     image = self.steps[step_name](image, **params)
@@ -58,6 +61,6 @@ class ImagePreprocessor:
         Returns:
             bool: True if the image has low contrast, False otherwise.
         """
-        contrast_config = self.config.get("contrast_check", {})
-        threshold = contrast_config.get("threshold", 0.35)
+        contrast_config: Dict[str, Any] = self.config.get("contrast_check", {})
+        threshold: float = contrast_config.get("threshold", 0.35)
         return check_low_contrast(image, threshold=threshold)

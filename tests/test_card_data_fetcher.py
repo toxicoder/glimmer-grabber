@@ -1,50 +1,51 @@
 import unittest
-from unittest.mock import patch, mock_open
+from unittest.mock import patch, mock_open, MagicMock
 import json
 import os
 import time
+from typing import List, Dict, Any
 from src.glimmer_grabber.card_data_fetcher import CardDataFetcher
 
 class TestCardDataFetcher(unittest.TestCase):
-    def setUp(self):
-        self.cache_file = "test_cache.json"
-        self.fetcher = CardDataFetcher(cache_file=self.cache_file, cache_duration=3600)
-        self.mock_card_data = [{"name": "Card 1", "type": "Action", "set": "Set 1"}]
+    def setUp(self) -> None:
+        self.cache_file: str = "test_cache.json"
+        self.fetcher: CardDataFetcher = CardDataFetcher(cache_file=self.cache_file, cache_duration=3600)
+        self.mock_card_data: List[Dict[str, Any]] = [{"name": "Card 1", "type": "Action", "set": "Set 1"}]
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         if os.path.exists(self.cache_file):
             os.remove(self.cache_file)
 
     @patch('requests.get')
-    def test_fetch_card_data_success(self, mock_get):
+    def test_fetch_card_data_success(self, mock_get: MagicMock) -> None:
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = self.mock_card_data
         self.assertTrue(self.fetcher.fetch_card_data())
         self.assertEqual(len(self.fetcher.get_card_data()), 1)
 
     @patch('requests.get')
-    def test_fetch_card_data_failure(self, mock_get):
+    def test_fetch_card_data_failure(self, mock_get: MagicMock) -> None:
         mock_get.return_value.status_code = 500
         self.assertFalse(self.fetcher.fetch_card_data())
         self.assertEqual(len(self.fetcher.get_card_data()), 0)
 
     @patch('requests.get')
-    def test_fetch_card_data_invalid_response(self, mock_get):
+    def test_fetch_card_data_invalid_response(self, mock_get: MagicMock) -> None:
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = {"error": "Invalid format"}
         self.assertFalse(self.fetcher.fetch_card_data())
         self.assertEqual(len(self.fetcher.get_card_data()), 0)
 
-    def test_validate_card_data_success(self):
-        card = {"name": "Card 1", "type": "Action", "set": "Set 1"}
+    def test_validate_card_data_success(self) -> None:
+        card: Dict[str, str] = {"name": "Card 1", "type": "Action", "set": "Set 1"}
         self.assertTrue(self.fetcher.validate_card_data(card))
 
-    def test_validate_card_data_missing_field(self):
-        card = {"name": "Card 1", "set": "Set 1"}
+    def test_validate_card_data_missing_field(self) -> None:
+        card: Dict[str, str] = {"name": "Card 1", "set": "Set 1"}
         self.assertFalse(self.fetcher.validate_card_data(card))
 
     @patch('requests.get')
-    def test_load_and_validate_data(self, mock_get):
+    def test_load_and_validate_data(self, mock_get: MagicMock) -> None:
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = [
             {"name": "Card 1", "type": "Action", "set": "Set 1"},
@@ -57,7 +58,7 @@ class TestCardDataFetcher(unittest.TestCase):
     @patch('time.time')
     @patch('os.path.getmtime')
     @patch('builtins.open', new_callable=mock_open, read_data=json.dumps([{"name": "Cached Card", "type": "Character", "set": "Cached Set"}]))
-    def test_load_from_cache(self, mock_file, mock_getmtime, mock_time, mock_exists):
+    def test_load_from_cache(self, mock_file: MagicMock, mock_getmtime: MagicMock, mock_time: MagicMock, mock_exists: MagicMock) -> None:
         mock_exists.return_value = True
         mock_time.return_value = 1000  # Simulate current time
         mock_getmtime.return_value = 900  # Simulate cache modified time (within validity)
@@ -66,7 +67,7 @@ class TestCardDataFetcher(unittest.TestCase):
 
     @patch('requests.get')
     @patch('builtins.open', new_callable=mock_open)
-    def test_save_to_cache(self, mock_file, mock_get):
+    def test_save_to_cache(self, mock_file: MagicMock, mock_get: MagicMock) -> None:
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = self.mock_card_data
         self.fetcher.fetch_card_data()

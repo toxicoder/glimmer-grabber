@@ -4,6 +4,8 @@ import time
 import os
 from typing import List, Dict, Any
 
+CardData = List[Dict[str, Any]]
+
 class CardDataFetcher:
     """
     Fetches card data from a specified API with caching.
@@ -23,10 +25,10 @@ class CardDataFetcher:
             cache_file (str): The path to the cache file.
             cache_duration (int): The cache validity duration in seconds.
         """
-        self.api_url = api_url
-        self.cache_file = cache_file
-        self.cache_duration = cache_duration
-        self.card_data: List[Dict[str, Any]] = []
+        self.api_url: str = api_url
+        self.cache_file: str = cache_file
+        self.cache_duration: int = cache_duration
+        self.card_data: CardData = []
 
     def _is_cache_valid(self) -> bool:
         """
@@ -37,7 +39,7 @@ class CardDataFetcher:
         """
         if not os.path.exists(self.cache_file):
             return False
-        modification_time = os.path.getmtime(self.cache_file)
+        modification_time: float = os.path.getmtime(self.cache_file)
         return time.time() - modification_time < self.cache_duration
 
     def _load_from_cache(self) -> bool:
@@ -49,7 +51,7 @@ class CardDataFetcher:
         """
         try:
             with open(self.cache_file, "r") as f:
-                cache_data = json.load(f)
+                cache_data: Any = json.load(f)
                 if isinstance(cache_data, list):
                     self.card_data = cache_data
                     return True
@@ -86,9 +88,9 @@ class CardDataFetcher:
             return True
 
         try:
-            response = requests.get(self.api_url + "cards.json")
+            response: requests.Response = requests.get(self.api_url + "cards.json")
             response.raise_for_status()  # Raise an exception for bad status codes
-            data = response.json()
+            data: Any = response.json()
             if isinstance(data, list):
                 self.card_data = data
                 self._save_to_cache()  # Save the fetched data to the cache
@@ -100,7 +102,7 @@ class CardDataFetcher:
             print(f"Error fetching card data: {e}")
             return False
 
-    def get_card_data(self) -> List[Dict[str, Any]]:
+    def get_card_data(self) -> CardData:
         """
         Returns the fetched card data.
 
@@ -120,7 +122,7 @@ class CardDataFetcher:
             bool: True if the card data is valid, False otherwise.
         """
         # Add basic validation - check for required fields
-        required_fields = ["name", "type", "set"]
+        required_fields: List[str] = ["name", "type", "set"]
         for field in required_fields:
             if field not in card:
                 print(f"Validation Error: Missing '{field}' in card data.")
@@ -135,7 +137,7 @@ class CardDataFetcher:
             bool: True if data loading and validation were successful, False otherwise.
         """
         if self.fetch_card_data():  # This now uses the cache
-            validated_data: List[Dict[str, Any]] = []
+            validated_data: CardData = []
             for card in self.card_data:
                 if self.validate_card_data(card):
                     validated_data.append(card)
