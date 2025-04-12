@@ -26,7 +26,7 @@ def main():
     print(f"Keep split card images: {keep_split_card_images}")
     print(f"Crawl subdirectories: {crawl_directories}")
 
-    history_file = os.path.join(output_path, "processed_images.txt")
+    history_file = os.path.join("data", "processed_images.txt")
     if not os.path.exists(history_file):
         with open(history_file, "w") as f:
             pass
