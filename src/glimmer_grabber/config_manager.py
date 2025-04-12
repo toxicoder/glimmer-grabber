@@ -50,7 +50,9 @@ class ConfigManager:
             "threshold": "threshold",
             "api_key": "api_key",
             "keep_split_card_images": "keep_split_card_images",
-            "crawl_directories": "crawl_directories"
+            "crawl_directories": "crawl_directories",
+            "save_segmented_images_path": "save_segmented_images_path",
+            "save_segmented_images": "save_segmented_images"
         }
 
         for arg_name, config_key in arg_mapping.items():
@@ -110,3 +112,21 @@ class ConfigManager:
             Optional[bool]: The setting as a bool, or None if not found.
         """
         return self.config.get("crawl_directories")
+
+    def get_save_segmented_images_path(self) -> Optional[str]:
+        """
+        Retrieves the path to save segmented card images, prioritizing CLI arguments over the configuration file.
+
+        Returns:
+            Optional[str]: The path as a string, or None if not found.
+        """
+        return self.config.get("save_segmented_images_path")
+
+    def get_save_segmented_images(self) -> Optional[bool]:
+        """
+        Retrieves the save_segmented_images setting, prioritizing CLI arguments over the configuration file.
+
+        Returns:
+            Optional[bool]: The setting as a bool, or None if not found.
+        """
+        return self.config.get("save_segmented_images")
