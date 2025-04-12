@@ -1,8 +1,9 @@
 import cv2
 import numpy as np
+from typing import List, Dict, Any
 
 class CardSegmenter:
-    def __init__(self, model_path="yolov8n-seg.pt"):
+    def __init__(self, model_path: str = "yolov8n-seg.pt") -> None:
         """Initializes the CardSegmenter with a YOLOv8-seg model.
 
         Args:
@@ -14,7 +15,7 @@ class CardSegmenter:
         except ImportError:
             raise ImportError("Please install the 'ultralytics' package to use YOLOv8.")
 
-    def segment_cards(self, image):
+    def segment_cards(self, image: np.ndarray) -> List[Dict[str, Any]]:
         """Detects and segments cards in an image.
 
         Args:
@@ -31,7 +32,7 @@ class CardSegmenter:
             if results:
                 masks = results[0].masks.data.cpu().numpy()
                 boxes = results[0].boxes.xyxy.cpu().numpy()
-                segmentations = []
+                segmentations: List[Dict[str, Any]] = []
                 for i in range(len(masks)):
                     mask = masks[i]
                     bbox = boxes[i]

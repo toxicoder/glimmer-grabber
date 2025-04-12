@@ -1,6 +1,8 @@
 from card_segmenter import CardSegmenter
+import numpy as np
+from typing import List, Dict, Any
 
-def run_inference(image, segmenter, confidence_threshold=0.5):
+def run_inference(image: np.ndarray, segmenter: CardSegmenter, confidence_threshold: float = 0.5) -> List[Dict[str, Any]]:
     """Runs inference on a preprocessed image using the CardSegmenter.
 
     Args:
@@ -16,7 +18,7 @@ def run_inference(image, segmenter, confidence_threshold=0.5):
     """
     try:
         results = segmenter.segment_cards(image)
-        filtered_results = []
+        filtered_results: List[Dict[str, Any]] = []
         for result in results:
             # Assuming segment_cards now returns confidence scores as well
             if "confidence" in result and result["confidence"] >= confidence_threshold:
