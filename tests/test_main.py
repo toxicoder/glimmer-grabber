@@ -73,5 +73,20 @@ class TestHistoryLog(unittest.TestCase):
         calls = [call("image1.jpg\n"), call("image2.png\n")]  # History file is opened in "read" then "append" mode
         handle.write.assert_has_calls([call("image2.png\n")], any_order=False)  # only "image2.png" should be written
 
+    @patch("os.path.exists")
+    @patch("builtins.open", new_callable=mock_open)
+    @patch("image_reader.read_images_from_folder", return_value=["image3.jpg", "image4.png"])
+    def test_history_file_in_data_dir(self, mock_read_images, mock_file, mock_exists):
+        history_file_path = os.path.join("data", "processed_images.txt")
+        config_manager = ConfigManager(cli_args={"output_dir": self.output_dir, "input_dir": "dummy_input"})
+        with patch("main.config_manager", config_manager):
+            main.main()
+
+        mock_exists.assert_called_with(history_file_path)
+        handle = mock_file()
+        file_calls = [call(history_file_path, 'r'), call(history_file_path, 'a')]
+        mock_file.assert_has_calls(file_calls, any_order=True)
+        handle.write.assert_has_calls([call("image3.jpg\n"), call("image4.png\n")], any_order=False)
+
 if __name__ == "__main__":
     unittest.main()
