@@ -4,11 +4,12 @@ import numpy as np
 from typing import Tuple
 
 def check_low_contrast(image: np.ndarray, threshold: float = 0.35) -> bool:
-    """Checks if an image has low contrast.
+    """
+    Checks if an image has low contrast.
 
     Args:
-        image (NumPy array): The input image.
-        threshold (float):  Threshold value to consider an image as low contrast.
+        image (np.ndarray): The input image as a NumPy array.
+        threshold (float): The threshold value to consider an image as low contrast (default: 0.35).
 
     Returns:
         bool: True if the image has low contrast, False otherwise.
