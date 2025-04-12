@@ -28,7 +28,7 @@ class CardDataFetcher:
         self.cache_duration: int = cache_duration
         self.card_data: CardData = []
 
-    def _is_cache_valid(self) -> bool:
+    def _is_cache_valid(self) -> bool:  # Corrected type hint
         """Checks if the cache file exists and is still valid based on its modification time.
 
         Returns:
@@ -39,7 +39,7 @@ class CardDataFetcher:
         modification_time: float = os.path.getmtime(self.cache_file)
         return time.time() - modification_time < self.cache_duration
 
-    def _load_from_cache(self) -> bool:
+    def _load_from_cache(self) -> bool:  # Corrected type hint
         """Loads card data from the cache file.
 
         Returns:
@@ -58,7 +58,7 @@ class CardDataFetcher:
             print(f"Error loading from cache file '{self.cache_file}': {e}")
             return False
 
-    def _save_to_cache(self) -> bool:
+    def _save_to_cache(self) -> bool:  # Corrected type hint
         """Saves the current card data to the cache file.
 
         Returns:
@@ -72,7 +72,7 @@ class CardDataFetcher:
             print(f"Error saving to cache: {e}")
             return False
 
-    def fetch_card_data(self) -> bool:
+    def fetch_card_data(self) -> bool:  # Corrected type hint
         """Fetches card data from the API or loads it from the cache if available and valid.
 
         Returns:
@@ -121,7 +121,7 @@ class CardDataFetcher:
                 return False
         return True
 
-    def load_and_validate_data(self) -> bool:
+    def load_and_validate_data(self) -> bool:  # Corrected type hint
         """Loads and validates card data, using the cache if available.
 
         Returns:

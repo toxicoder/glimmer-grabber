@@ -3,6 +3,7 @@ import os
 from typing import List
 from .config_manager import ConfigManager
 from .image_reader import read_images_from_folder
+from .image_processor import process_images  # Import the new function
 
 def load_processed_images() -> List[str]:
     history_file: str = os.path.join("data", "processed_images.log")
@@ -11,7 +12,7 @@ def load_processed_images() -> List[str]:
     with open(history_file, "r") as f:
         return [line.strip() for line in f]
 
-processed_images: List[str] = load_processed_images()
+processed_images: List[str] = load_processed_images()  # Adding type hint here
 
 def parse_arguments() -> argparse.Namespace:
     """Parses command-line arguments.
@@ -31,7 +32,7 @@ def parse_arguments() -> argparse.Namespace:
 
 def main() -> None:
     """Main function to handle command-line arguments and process images."""
-    args: argparse.Namespace = parse_arguments()
+    args: argparse.Namespace = parse_arguments()  # Type hint already present
     config_manager: ConfigManager = ConfigManager(cli_args=args)
 
     input_path: str = config_manager.get_input_path()
@@ -50,31 +51,8 @@ def main() -> None:
 
     image_files: List[str] = read_images_from_folder()
 
-    from src.core.card_segmenter import CardSegmenter  # Import here to avoid circular import
-    card_segmenter: CardSegmenter = CardSegmenter()
-
-    with open(os.path.join("data", "processed_images.log"), "a") as f:
-        for image_path in image_files:
-            if image_path in processed_images:
-                print(f"Skipping already processed image: {image_path}")
-                continue
-
-            print(f"Processing image: {image_path}")
-            try:
-                # Read the image using cv2
-                import cv2
-                from typing import Optional
-                image: Optional[cv2.Mat] = cv2.imread(image_path)
-                if image is None:
-                    print(f"Error: Could not read image at {image_path}")
-                    continue
-
-                # Perform card segmentation
-                segmentations = card_segmenter.segment_cards(image)
-
-                f.write(image_path + "\n")
-            except Exception as e:
-                print(f"Error processing image {image_path}: {e}")
+    # Call the new process_images function
+    process_images(image_files, output_path, save_segmented_images, save_segmented_images_path)
 
 if __name__ == "__main__":
     main()
