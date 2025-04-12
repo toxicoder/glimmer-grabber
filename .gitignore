@@ -106,3 +106,5 @@ venv/
 
 # card_data_cache.json
 card_data_cache.json
+config.json
+data/*
