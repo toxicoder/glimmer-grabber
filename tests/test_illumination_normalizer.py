@@ -1,7 +1,7 @@
 import unittest
 import cv2
 import numpy as np
-from illumination_normalizer import normalize_illumination
+from src.utils.illumination_normalizer import normalize_illumination
 
 class TestIlluminationNormalizer(unittest.TestCase):
     def test_normalize_illumination(self):

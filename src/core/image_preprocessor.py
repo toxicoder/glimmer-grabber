@@ -1,7 +1,7 @@
-from .noise_reducer import reduce_noise
-from .illumination_normalizer import normalize_illumination
-from .contrast_checker import check_low_contrast
-from .grayscale_converter import convert_to_grayscale
+from src.utils.noise_reducer import reduce_noise
+from src.utils.illumination_normalizer import normalize_illumination
+from src.utils.contrast_checker import check_low_contrast
+from src.utils.grayscale_converter import convert_to_grayscale
 import numpy as np
 from typing import Dict, Any
 

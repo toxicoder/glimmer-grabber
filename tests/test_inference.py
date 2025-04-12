@@ -1,8 +1,8 @@
 import unittest
 import numpy as np
 from unittest.mock import patch
-from inference import run_inference
-from card_segmenter import CardSegmenter
+from src.core.inference import run_inference
+from src.core.card_segmenter import CardSegmenter
 
 class TestInference(unittest.TestCase):
     def test_run_inference_no_detection(self):

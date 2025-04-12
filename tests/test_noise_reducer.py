@@ -1,7 +1,7 @@
 import unittest
 import cv2
 import numpy as np
-from noise_reducer import reduce_noise
+from src.utils.noise_reducer import reduce_noise
 
 class TestNoiseReducer(unittest.TestCase):
     def test_reduce_noise(self):

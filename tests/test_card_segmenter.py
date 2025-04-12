@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from card_segmenter import CardSegmenter
+from src.core.card_segmenter import CardSegmenter
 
 class TestCardSegmenter(unittest.TestCase):
     def test_segment_cards_no_detection(self):

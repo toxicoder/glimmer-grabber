@@ -1,7 +1,7 @@
 import unittest
 import cv2
 import numpy as np
-from grayscale_converter import convert_to_grayscale
+from src.utils.grayscale_converter import convert_to_grayscale
 
 class TestGrayscaleConverter(unittest.TestCase):
     def test_convert_to_grayscale(self):

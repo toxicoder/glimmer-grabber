@@ -1,7 +1,7 @@
 import unittest
 import cv2
 import numpy as np
-from image_preprocessor import ImagePreprocessor
+from src.core.image_preprocessor import ImagePreprocessor
 
 class TestImagePreprocessor(unittest.TestCase):
     def test_preprocess_with_all_steps(self):

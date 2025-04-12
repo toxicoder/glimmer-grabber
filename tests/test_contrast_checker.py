@@ -1,7 +1,7 @@
 import unittest
 import cv2
 import numpy as np
-from contrast_checker import check_low_contrast
+from src.utils.contrast_checker import check_low_contrast
 
 class TestContrastChecker(unittest.TestCase):
     def test_check_low_contrast_low(self):
