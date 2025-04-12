@@ -50,14 +50,33 @@ class CardSegmenter:
                     mask = masks[i]
                     bbox = boxes[i]
                     segmentation: Dict[str, Any] = {"mask": mask, "bbox": bbox}
-                    if keep_split_card_images:
-                        x1, y1, x2, y2 = map(int, bbox)
-                        segmented_image = image[y1:y2, x1:x2]
-                        segmentation["image"] = segmented_image
+                    x1, y1, x2, y2 = map(int, bbox)
+                    segmented_image = image[y1:y2, x1:x2]
+                    segmentation["image"] = segmented_image
                     segmentations.append(segmentation)
+                config_manager = ConfigManager()
+                if config_manager.get_save_segmented_images():
+                    output_dir = config_manager.get_save_segmented_images_path()
+                    if output_dir:
+                        self.save_segmented_cards(segmentations, output_dir)
                 return segmentations
             else:
                 return []
         except Exception as e:
             print(f"Error during segmentation: {e}")
             return []
+
+    def save_segmented_cards(self, segmentations: List[Dict[str, Any]], output_dir: str) -> None:
+        """Saves the segmented card images to the specified directory.
+
+        Args:
+            segmentations (List[Dict[str, Any]]): A list of card segmentation dictionaries.
+            output_dir (str): The directory to save the segmented card images.
+        """
+        import os
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        for i, segmentation in enumerate(segmentations):
+            image = segmentation["image"]
+            filename = os.path.join(output_dir, f"card_{i}.png")
+            cv2.imwrite(filename, image)
