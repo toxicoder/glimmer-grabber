@@ -14,6 +14,11 @@ def load_processed_images() -> List[str]:
 processed_images: List[str] = load_processed_images()
 
 def parse_arguments() -> argparse.Namespace:
+    """Parses command-line arguments.
+
+    Returns:
+        An argparse.Namespace object containing the parsed arguments.
+    """
     parser: argparse.ArgumentParser = argparse.ArgumentParser(description="CLI for processing card images.")
     parser.add_argument("input_dir", help="Path to the input directory.")
     parser.add_argument("output_dir", help="Path to the output directory.")
@@ -25,6 +30,7 @@ def parse_arguments() -> argparse.Namespace:
     return parser.parse_args()
 
 def main() -> None:
+    """Main function to handle command-line arguments and process images."""
     args: argparse.Namespace = parse_arguments()
     config_manager: ConfigManager = ConfigManager(cli_args=args)
 

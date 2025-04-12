@@ -6,13 +6,12 @@ from typing import List, Iterator, Optional
 from .config_manager import ConfigManager
 
 def read_images_from_folder() -> List[np.ndarray]:
-    """
-    Reads image files (JPG, JPEG, PNG) from the input directory specified in the configuration.
+    """Reads image files (JPG, JPEG, PNG) from the input directory specified in the configuration.
     Handles crawling of subdirectories based on the configuration.
 
     Returns:
-        List[np.ndarray]: A list of images as NumPy arrays.
-                         Returns an empty list if no images are found or if an error occurs.
+        A list of images as NumPy arrays.
+        Returns an empty list if no images are found or if an error occurs.
     """
     config_manager: ConfigManager = ConfigManager()
     folder_path: Optional[str] = config_manager.get_input_path()
@@ -43,14 +42,13 @@ def read_images_from_folder() -> List[np.ndarray]:
         return []
 
 def iterate_images(image_list: List[np.ndarray]) -> Iterator[np.ndarray]:
-    """
-    Iterates through a list of images.
+    """Iterates through a list of images.
 
     Args:
-        image_list (List[np.ndarray]): A list of images as NumPy arrays.
+        image_list: A list of images as NumPy arrays.
 
     Yields:
-        np.ndarray: Each image in the list.
+        Each image in the list.
     """
     for image in image_list:
         yield image
