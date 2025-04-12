@@ -1,4 +1,4 @@
-from card_segmenter import CardSegmenter
+from .card_segmenter import CardSegmenter
 import numpy as np
 from typing import List, Dict, Any
 

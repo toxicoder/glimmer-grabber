@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from typing import List, Dict, Any
-from config_manager import ConfigManager
+from .config_manager import ConfigManager
 
 class CardSegmenter:
     """
