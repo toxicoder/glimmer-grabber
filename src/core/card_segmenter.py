@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from typing import List, Dict, Any
 from .config_manager import ConfigManager
+import pytesseract
 
 class CardSegmenter:
     """
@@ -53,6 +54,8 @@ class CardSegmenter:
                     x1, y1, x2, y2 = map(int, bbox)
                     segmented_image = image[y1:y2, x1:x2]
                     segmentation["image"] = segmented_image
+                    card_name = self.identify_card_name(segmented_image)
+                    segmentation["card_name"] = card_name
                     segmentations.append(segmentation)
                 config_manager = ConfigManager()
                 if config_manager.get_save_segmented_images():
@@ -66,6 +69,28 @@ class CardSegmenter:
             print(f"Error during segmentation: {e}")
             return []
 
+    def identify_card_name(self, image: np.ndarray) -> str:
+        """Identifies the card name from an image using OCR.
+
+        Args:
+            image (np.ndarray): The segmented card image.
+
+        Returns:
+            str: The identified card name, or "Unknown Card" if identification fails.
+        """
+        try:
+            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            # Adding some preprocessing to improve OCR accuracy
+            thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+            text = pytesseract.image_to_string(thresh).strip()
+            if text:
+                return text
+            else:
+                return "Unknown Card"
+        except Exception as e:
+            print(f"Error during card name identification: {e}")
+            return "Unknown Card"
+
     def save_segmented_cards(self, segmentations: List[Dict[str, Any]], output_dir: str) -> None:
         """Saves the segmented card images to the specified directory.
 
@@ -74,9 +99,22 @@ class CardSegmenter:
             output_dir (str): The directory to save the segmented card images.
         """
         import os
+        import re
+
+        def sanitize_filename(filename: str) -> str:
+            """Sanitizes a string to be safe for use as a filename.
+
+            Replaces any character that is not alphanumeric, underscore, or dot with an underscore.
+            """
+            return re.sub(r"[^a-zA-Z0-9_.]", "_", filename)
+
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         for i, segmentation in enumerate(segmentations):
             image = segmentation["image"]
-            filename = os.path.join(output_dir, f"card_{i}.png")
+            card_name = segmentation.get("card_name", "Unknown Card")
+            if card_name and card_name != "Unknown Card":
+                filename = os.path.join(output_dir, f"{sanitize_filename(card_name)}.png")
+            else:
+                filename = os.path.join(output_dir, f"card_{i}.png")
             cv2.imwrite(filename, image)
