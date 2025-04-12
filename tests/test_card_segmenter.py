@@ -1,18 +1,36 @@
 import unittest
 import numpy as np
 from src.core.card_segmenter import CardSegmenter
+from unittest.mock import patch, MagicMock
+import tempfile
+import shutil
+import os
 
 class TestCardSegmenter(unittest.TestCase):
+
+    def _create_mock_yolo(self):
+        """Helper function to create a mock YOLO model."""
+        mock_yolo = MagicMock()
+        mock_results = MagicMock()
+        mock_masks = MagicMock()
+        mock_boxes = MagicMock()
+        mock_data = MagicMock()
+        mock_data.cpu.return_value = mock_data
+        mock_data.numpy.return_value = [np.zeros((100, 100), dtype=np.uint8)], [[10, 10, 90, 90]]
+        mock_masks.data = mock_data
+        mock_boxes.xyxy = mock_data
+        mock_results.masks = mock_masks
+        mock_results.boxes = mock_boxes
+        mock_yolo.predict.return_value = [mock_results]
+        return mock_yolo
+
     def test_segment_cards_no_detection(self):
         # Mock the YOLO model to return empty results
-        class MockYOLO:
-            def __init__(self, model_path):
-                pass
-            def predict(self, image):
-                return []
+        mock_yolo = MagicMock()
+        mock_yolo.predict.return_value = []
 
         # Patch the YOLO class in CardSegmenter
-        with unittest.mock.patch("card_segmenter.YOLO", MockYOLO):
+        with patch("src.core.card_segmenter.YOLO", return_value=mock_yolo):
             segmenter = CardSegmenter()
             image = np.zeros((100, 100, 3), dtype=np.uint8)
             results = segmenter.segment_cards(image)
@@ -20,29 +38,10 @@ class TestCardSegmenter(unittest.TestCase):
 
     def test_segment_cards_with_detection(self):
         # Mock the YOLO model to return dummy results
-        class MockYOLO:
-            def __init__(self, model_path):
-                pass
-            def predict(self, image):
-                class MockResults:
-                    def __init__(self):
-                        self.masks = MockMasks()
-                        self.boxes = MockBoxes()
-                class MockMasks:
-                    def __init__(self):
-                        self.data = MockData()
-                class MockBoxes:
-                    def __init__(self):
-                        self.xyxy = MockData()
-                class MockData:
-                    def cpu(self):
-                        return self
-                    def numpy(self):
-                        return [np.zeros((100, 100), dtype=np.uint8)], [[10, 10, 90, 90]]
-                return [MockResults()]
+        mock_yolo = self._create_mock_yolo()
 
         # Patch the YOLO class in CardSegmenter
-        with unittest.mock.patch("card_segmenter.YOLO", MockYOLO):
+        with patch("src.core.card_segmenter.YOLO", return_value=mock_yolo):
             segmenter = CardSegmenter()
             image = np.zeros((100, 100, 3), dtype=np.uint8)
             results = segmenter.segment_cards(image)
@@ -54,18 +53,57 @@ class TestCardSegmenter(unittest.TestCase):
 
     def test_segment_cards_error_handling(self):
         # Mock the YOLO model to raise an exception
-        class MockYOLO:
-            def __init__(self, model_path):
-                pass
-            def predict(self, image):
-                raise Exception("Segmentation error")
+        mock_yolo = MagicMock()
+        mock_yolo.predict.side_effect = Exception("Segmentation error")
+
 
         # Patch the YOLO class in CardSegmenter
-        with unittest.mock.patch("card_segmenter.YOLO", MockYOLO):
+        with patch("src.core.card_segmenter.YOLO", return_value=mock_yolo):
             segmenter = CardSegmenter()
             image = np.zeros((100, 100, 3), dtype=np.uint8)
             results = segmenter.segment_cards(image)
             self.assertEqual(results, [])
+
+    def test_segment_cards_with_renaming(self):
+        # Mock YOLO model
+        mock_yolo = self._create_mock_yolo()
+
+        # Mock card name identification
+        mock_identify_card_name = MagicMock(return_value="Test Card Name")
+
+        # Create a temporary directory for saving images
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Mock ConfigManager to enable saving and set the temporary directory
+            mock_config_manager = MagicMock()
+            mock_config_manager.get_save_segmented_images.return_value = True
+            mock_config_manager.get_save_segmented_images_path.return_value = temp_dir
+
+            with patch("src.core.card_segmenter.YOLO", return_value=mock_yolo), \
+                    patch("src.core.card_segmenter.CardSegmenter.identify_card_name", mock_identify_card_name), \
+                    patch("src.core.card_segmenter.ConfigManager", return_value=mock_config_manager):
+
+                segmenter = CardSegmenter()
+                image = np.zeros((100, 100, 3), dtype=np.uint8)
+                segmenter.segment_cards(image)
+
+                # Assert that the image was saved with the correct filename
+                expected_filename = os.path.join(temp_dir, "Test_Card_Name.png")
+                self.assertTrue(os.path.exists(expected_filename))
+
+        # Test with saving disabled
+        mock_config_manager.get_save_segmented_images.return_value = False
+        with tempfile.TemporaryDirectory() as temp_dir:
+             mock_config_manager.get_save_segmented_images_path.return_value = temp_dir
+             with patch("src.core.card_segmenter.YOLO", return_value=mock_yolo), \
+                     patch("src.core.card_segmenter.CardSegmenter.identify_card_name", mock_identify_card_name), \
+                     patch("src.core.card_segmenter.ConfigManager", return_value=mock_config_manager):
+
+                 segmenter = CardSegmenter()
+                 image = np.zeros((100, 100, 3), dtype=np.uint8)
+                 segmenter.segment_cards(image)
+
+                 # Assert that no files were created
+                 self.assertEqual(len(os.listdir(temp_dir)), 0)
 
 if __name__ == '__main__':
     unittest.main()
