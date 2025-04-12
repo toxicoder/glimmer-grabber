@@ -3,13 +3,14 @@ import numpy as np
 from typing import Tuple
 
 def convert_to_grayscale(image: np.ndarray) -> np.ndarray:
-    """Converts an image to grayscale.
+    """
+    Converts an image to grayscale.
 
     Args:
-        image (NumPy array): The input image.
+        image (np.ndarray): The input image as a NumPy array.
 
     Returns:
-        NumPy array: The grayscale image.
+        np.ndarray: The grayscale image as a NumPy array.
     """
     gray_image: np.ndarray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     return gray_image

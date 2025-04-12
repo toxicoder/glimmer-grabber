@@ -3,11 +3,17 @@ import numpy as np
 from typing import List, Dict, Any
 
 class CardSegmenter:
+    """
+    Segments cards from an image using a YOLOv8 segmentation model.
+    """
     def __init__(self, model_path: str = "yolov8n-seg.pt") -> None:
         """Initializes the CardSegmenter with a YOLOv8-seg model.
 
         Args:
             model_path (str): Path to the YOLOv8-seg model file (default: yolov8n-seg.pt).
+
+        Raises:
+            ImportError: If the 'ultralytics' package is not installed.
         """
         try:
             from ultralytics import YOLO
@@ -19,13 +25,16 @@ class CardSegmenter:
         """Detects and segments cards in an image.
 
         Args:
-            image (NumPy array): The input image.
+            image (np.ndarray): The input image as a NumPy array.
 
         Returns:
-            list: A list of dictionaries, where each dictionary contains:
-                  - "mask": A binary mask (NumPy array) representing the card segmentation.
-                  - "bbox": A bounding box (list of 4 floats) in the format [x1, y1, x2, y2].
-                  Returns an empty list if no cards are detected or an error occurs.
+            List[Dict[str, Any]]: A list of dictionaries, where each dictionary represents a card segmentation and contains:
+                - "mask" (np.ndarray): A binary mask representing the card segmentation.
+                - "bbox" (List[float]): A bounding box in the format [x1, y1, x2, y2].
+            Returns an empty list if no cards are detected.
+
+        Raises:
+            Exception: If an error occurs during segmentation.
         """
         try:
             results = self.model.predict(image)
