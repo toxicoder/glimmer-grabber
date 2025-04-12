@@ -5,22 +5,20 @@ AppConfig = Dict[str, Any]
 CLIArgs = Optional[Dict[str, Any]]
 
 class ConfigManager:
-    """
-    Manages application configuration settings loaded from a JSON file,
+    """Manages application configuration settings loaded from a JSON file,
     prioritizing CLI arguments over the configuration file.
 
     Attributes:
-        config (dict): A dictionary holding the configuration settings.
-        cli_args (dict): A dictionary holding the CLI arguments.
+        config: A dictionary holding the configuration settings.
+        cli_args: A dictionary holding the CLI arguments.
     """
     def __init__(self, config_file: str = "config.json", cli_args: CLIArgs = None) -> None:
-        """
-        Initializes the ConfigManager by loading settings from the specified JSON file
+        """Initializes the ConfigManager by loading settings from the specified JSON file
         and updating them with CLI arguments.
 
         Args:
-            config_file (str): The path to the JSON configuration file. Defaults to "config.json".
-            cli_args (Optional[Dict[str, Any]]): A dictionary of CLI arguments. Defaults to None.
+            config_file: The path to the JSON configuration file. Defaults to "config.json".
+            cli_args: A dictionary of CLI arguments. Defaults to None.
 
         Raises:
             FileNotFoundError: If the configuration file does not exist.
@@ -40,11 +38,10 @@ class ConfigManager:
         self.update_with_cli_args(self.cli_args)
 
     def update_with_cli_args(self, cli_args: AppConfig) -> None:
-        """
-        Updates the configuration with values from CLI arguments, giving them priority.
+        """Updates the configuration with values from CLI arguments, giving them priority.
 
         Args:
-            cli_args (Dict[str, Any]): A dictionary of CLI arguments.
+            cli_args: A dictionary of CLI arguments.
         """
         # Map CLI argument names to config keys. Adjust as necessary to match your CLI arguments.
         arg_mapping: Dict[str, str] = {
@@ -63,73 +60,65 @@ class ConfigManager:
                 self.config[config_key] = cli_args[arg_name]
 
     def get_input_path(self) -> Optional[str]:
-        """
-        Retrieves the input path, prioritizing CLI arguments over the configuration file.
+        """Retrieves the input path, prioritizing CLI arguments over the configuration file.
 
         Returns:
-            Optional[str]: The input path as a string, or None if not found.
+            The input path as a string, or None if not found.
         """
         return self.config.get("input_path")
 
     def get_output_path(self) -> Optional[str]:
-        """
-        Retrieves the output path, prioritizing CLI arguments over the configuration file.
+        """Retrieves the output path, prioritizing CLI arguments over the configuration file.
 
         Returns:
-            Optional[str]: The output path as a string, or None if not found.
+            The output path as a string, or None if not found.
         """
         return self.config.get("output_path")
 
     def get_threshold(self) -> Optional[float]:
-        """
-        Retrieves the processing threshold, prioritizing CLI arguments over the configuration file.
+        """Retrieves the processing threshold, prioritizing CLI arguments over the configuration file.
 
         Returns:
-            Optional[float]: The threshold as a float, or None if not found.
+            The threshold as a float, or None if not found.
         """
         return self.config.get("threshold")
 
     def get_api_key(self) -> Optional[str]:
-        """
-        Retrieves the API key, prioritizing CLI arguments over the configuration file.
+        """Retrieves the API key, prioritizing CLI arguments over the configuration file.
 
         Returns:
-            Optional[str]: The API key as a string, or None if not found.
+            The API key as a string, or None if not found.
         """
         return self.config.get("api_key")
 
     def get_keep_split_card_images(self) -> Optional[bool]:
-        """
-        Retrieves the keep_split_card_images setting, prioritizing CLI arguments over the configuration file.
+        """Retrieves the keep_split_card_images setting, prioritizing CLI arguments over the configuration file.
 
         Returns:
-            Optional[bool]: The setting as a bool, or None if not found.
+            The setting as a bool, or None if not found.
         """
         return self.config.get("keep_split_card_images")
 
     def get_crawl_directories(self) -> Optional[bool]:
-        """
-        Retrieves the crawl_directories setting, prioritizing CLI arguments over the configuration file.
+        """Retrieves the crawl_directories setting, prioritizing CLI arguments over the configuration file.
 
         Returns:
-            Optional[bool]: The setting as a bool, or None if not found.
+            The setting as a bool, or None if not found.
         """
         return self.config.get("crawl_directories")
 
     def get_save_segmented_images_path(self) -> Optional[str]:
-        """
-        Retrieves the path to save segmented card images, prioritizing CLI arguments over the configuration file.
+        """Retrieves the path to save segmented card images, prioritizing CLI arguments over the configuration file.
 
         Returns:
-            Optional[str]: The path as a string, or None if not found.
+            The path as a string, or None if not found.
         """
         return self.config.get("save_segmented_images_path")
 
     def get_save_segmented_images(self) -> Optional[bool]:
-        """
-        Retrieves the save_segmented_images setting, prioritizing CLI arguments over the configuration file.
+        """Retrieves the save_segmented_images setting, prioritizing CLI arguments over the configuration file.
 
         Returns:
-            Optional[bool]: The setting as a bool, or None if not found.
+            The setting as a bool, or None if not found.
         """
         return self.config.get("save_segmented_images")

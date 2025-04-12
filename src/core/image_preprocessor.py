@@ -8,20 +8,18 @@ from typing import Dict, Any
 PreprocessingConfig = Dict[str, Dict[str, Any]]
 
 class ImagePreprocessor:
-    """
-    Preprocesses images by applying a series of transformations based on a configuration.
+    """Preprocesses images by applying a series of transformations based on a configuration.
 
     Attributes:
-        config (Dict[str, Any]): A dictionary containing the preprocessing configuration.
-        steps (Dict[str, Any]): A dictionary mapping preprocessing step names to their corresponding functions.
+        config: A dictionary containing the preprocessing configuration.
+        steps: A dictionary mapping preprocessing step names to their corresponding functions.
     """
     def __init__(self, config: PreprocessingConfig) -> None:
-        """
-        Initializes the ImagePreprocessor with a configuration.
+        """Initializes the ImagePreprocessor with a configuration.
 
         Args:
-            config (Dict[str, Any]): A dictionary containing the preprocessing configuration.
-                                     The configuration should define the steps to be applied and their parameters.
+            config: A dictionary containing the preprocessing configuration.
+                The configuration should define the steps to be applied and their parameters.
         """
         self.config: PreprocessingConfig = config
         self.steps = {
@@ -31,14 +29,13 @@ class ImagePreprocessor:
         }
 
     def preprocess(self, image: np.ndarray) -> np.ndarray:
-        """
-        Applies the configured preprocessing steps to an image.
+        """Applies the configured preprocessing steps to an image.
 
         Args:
-            image (np.ndarray): The input image as a NumPy array.
+            image: The input image as a NumPy array.
 
         Returns:
-            np.ndarray: The preprocessed image as a NumPy array.
+            The preprocessed image as a NumPy array.
         """
         steps: Dict[str, Dict[str, Any]] = self.config.get("steps", {})
         for step_name, params in steps.items():
@@ -52,14 +49,13 @@ class ImagePreprocessor:
         return image
 
     def check_contrast(self, image: np.ndarray) -> bool:
-        """
-        Checks the contrast of an image.
+        """Checks the contrast of an image.
 
         Args:
-            image (np.ndarray): The input image as a NumPy array.
+            image: The input image as a NumPy array.
 
         Returns:
-            bool: True if the image has low contrast, False otherwise.
+            True if the image has low contrast, False otherwise.
         """
         contrast_config: Dict[str, Any] = self.config.get("contrast_check", {})
         threshold: float = contrast_config.get("threshold", 0.35)

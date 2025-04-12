@@ -7,23 +7,21 @@ from typing import List, Dict, Any
 CardData = List[Dict[str, Any]]
 
 class CardDataFetcher:
-    """
-    Fetches card data from a specified API with caching.
+    """Fetches card data from a specified API with caching.
 
     Attributes:
-        api_url (str): The URL of the API to fetch data from. Defaults to "https://lorcanajson.org/".
-        cache_file (str): The path to the cache file. Defaults to "card_data_cache.json".
-        cache_duration (int): The duration (in seconds) for which the cache is considered valid. Defaults to 3600 seconds (1 hour).
-        card_data (List[Dict[str, Any]]): A list to store the fetched card data.
+        api_url: The URL of the API to fetch data from. Defaults to "https://lorcanajson.org/".
+        cache_file: The path to the cache file. Defaults to "card_data_cache.json".
+        cache_duration: The duration (in seconds) for which the cache is considered valid. Defaults to 3600 seconds (1 hour).
+        card_data: A list to store the fetched card data.
     """
     def __init__(self, api_url: str = "https://lorcanajson.org/", cache_file: str = "card_data_cache.json", cache_duration: int = 3600) -> None:
-        """
-        Initializes the CardDataFetcher with the given API URL, cache file, and cache duration.
+        """Initializes the CardDataFetcher with the given API URL, cache file, and cache duration.
 
         Args:
-            api_url (str): The URL of the API.
-            cache_file (str): The path to the cache file.
-            cache_duration (int): The cache validity duration in seconds.
+            api_url: The URL of the API.
+            cache_file: The path to the cache file.
+            cache_duration: The cache validity duration in seconds.
         """
         self.api_url: str = api_url
         self.cache_file: str = cache_file
@@ -31,11 +29,10 @@ class CardDataFetcher:
         self.card_data: CardData = []
 
     def _is_cache_valid(self) -> bool:
-        """
-        Checks if the cache file exists and is still valid based on its modification time.
+        """Checks if the cache file exists and is still valid based on its modification time.
 
         Returns:
-            bool: True if the cache is valid, False otherwise.
+            True if the cache is valid, False otherwise.
         """
         if not os.path.exists(self.cache_file):
             return False
@@ -43,11 +40,10 @@ class CardDataFetcher:
         return time.time() - modification_time < self.cache_duration
 
     def _load_from_cache(self) -> bool:
-        """
-        Loads card data from the cache file.
+        """Loads card data from the cache file.
 
         Returns:
-            bool: True if data was successfully loaded from the cache, False otherwise.
+            True if data was successfully loaded from the cache, False otherwise.
         """
         try:
             with open(self.cache_file, "r") as f:
@@ -63,11 +59,10 @@ class CardDataFetcher:
             return False
 
     def _save_to_cache(self) -> bool:
-        """
-        Saves the current card data to the cache file.
+        """Saves the current card data to the cache file.
 
         Returns:
-            bool: True if data was successfully saved to the cache, False otherwise.
+            True if data was successfully saved to the cache, False otherwise.
         """
         try:
             with open(self.cache_file, "w") as f:
@@ -78,11 +73,10 @@ class CardDataFetcher:
             return False
 
     def fetch_card_data(self) -> bool:
-        """
-        Fetches card data from the API or loads it from the cache if available and valid.
+        """Fetches card data from the API or loads it from the cache if available and valid.
 
         Returns:
-            bool: True if data fetching or loading was successful, False otherwise.
+            True if data fetching or loading was successful, False otherwise.
         """
         if self._is_cache_valid() and self._load_from_cache():
             return True
@@ -103,23 +97,21 @@ class CardDataFetcher:
             return False
 
     def get_card_data(self) -> CardData:
-        """
-        Returns the fetched card data.
+        """Returns the fetched card data.
 
         Returns:
-            List[Dict[str, Any]]: A list of card data dictionaries.
+            A list of card data dictionaries.
         """
         return self.card_data
 
     def validate_card_data(self, card: Dict[str, Any]) -> bool:
-        """
-        Validates a single card's data.
+        """Validates a single card's data.
 
         Args:
-            card (Dict[str, Any]): A dictionary representing a card's data.
+            card: A dictionary representing a card's data.
 
         Returns:
-            bool: True if the card data is valid, False otherwise.
+            True if the card data is valid, False otherwise.
         """
         # Add basic validation - check for required fields
         required_fields: List[str] = ["name", "type", "set"]
@@ -130,11 +122,10 @@ class CardDataFetcher:
         return True
 
     def load_and_validate_data(self) -> bool:
-        """
-        Loads and validates card data, using the cache if available.
+        """Loads and validates card data, using the cache if available.
 
         Returns:
-            bool: True if data loading and validation were successful, False otherwise.
+            True if data loading and validation were successful, False otherwise.
         """
         if self.fetch_card_data():  # This now uses the cache
             validated_data: CardData = []

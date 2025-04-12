@@ -7,14 +7,13 @@ import os
 import re
 
 class CardSegmenter:
-    """
-    Segments cards from an image using a YOLOv8 segmentation model.
-    """
+    """Segments cards from an image using a YOLOv8 segmentation model."""
+
     def __init__(self, model_path: str = "yolov8n-seg.pt") -> None:
         """Initializes the CardSegmenter with a YOLOv8-seg model.
 
         Args:
-            model_path (str): Path to the YOLOv8-seg model file (default: yolov8n-seg.pt).
+            model_path: Path to the YOLOv8-seg model file (default: yolov8n-seg.pt).
 
         Raises:
             ImportError: If the 'ultralytics' package is not installed.
@@ -29,14 +28,14 @@ class CardSegmenter:
         """Detects and segments cards in an image.
 
         Args:
-            image (np.ndarray): The input image as a NumPy array.
+            image: The input image as a NumPy array.
 
         Returns:
-            List[Dict[str, Any]]: A list of dictionaries, where each dictionary represents a card segmentation and contains:
-                - "mask" (np.ndarray): A binary mask representing the card segmentation.
-                - "bbox" (List[float]): A bounding box in the format [x1, y1, x2, y2].
-                - "image" (np.ndarray, optional): The segmented card image if keep_split_card_images is True.
-                - "card_name" (str): The identified card name.
+            A list of dictionaries, where each dictionary represents a card segmentation and contains:
+                - "mask": A binary mask representing the card segmentation.
+                - "bbox": A bounding box in the format [x1, y1, x2, y2].
+                - "image": The segmented card image.
+                - "card_name": The identified card name.
             Returns an empty list if no cards are detected.
 
         Raises:
@@ -76,10 +75,10 @@ class CardSegmenter:
         """Identifies the card name from an image using OCR.
 
         Args:
-            image (np.ndarray): The segmented card image.
+            image: The segmented card image.
 
         Returns:
-            str: The identified card name, or "Unknown Card" if identification fails.
+            The identified card name, or "Unknown Card" if identification fails.
         """
         try:
             gray: np.ndarray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -98,8 +97,8 @@ class CardSegmenter:
         """Saves the segmented card images to the specified directory.
 
         Args:
-            segmentations (List[Dict[str, Any]]): A list of card segmentation dictionaries.
-            output_dir (str): The directory to save the segmented card images.
+            segmentations: A list of card segmentation dictionaries.
+            output_dir: The directory to save the segmented card images.
         """
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)

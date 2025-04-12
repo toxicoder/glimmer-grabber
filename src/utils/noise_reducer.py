@@ -3,17 +3,20 @@ import numpy as np
 from typing import Tuple
 
 def reduce_noise(image: np.ndarray, strength: float = 10.0, color_strength: float = 10.0, template_window_size: int = 7, search_window_size: int = 21) -> np.ndarray:
-    """Reduces noise in a color image using cv2.fastNlMeansDenoisingColored.
+    """Reduces noise in a color image using fast Non-local Means Denoising for color images.
+
+    This function uses cv2.fastNlMeansDenoisingColored, which is optimized for speed
+    compared to the more general cv2.fastNlMeansDenoising.
 
     Args:
-        image (NumPy array): The input color image.
-        strength (int): Strength of the denoising filter. Higher values mean stronger denoising.
-        color_strength (int): Strength of the color denoising. Higher values mean stronger color denoising.
-        template_window_size (int): Size of the template patch that is used to compute weights. Should be odd.
-        search_window_size (int): Size of the search window that is used to compute weighted average for the given pixel. Should be odd.
+        image: The input color image as a NumPy array.
+        strength: Strength of the denoising filter (for luminance). Higher values mean stronger denoising (default: 10.0).
+        color_strength: Strength of the color denoising filter. A higher value results in stronger color denoising (default: 10.0).
+        template_window_size: Size of the template patch that is used to compute weights. Should be odd (default: 7).
+        search_window_size: Size of the search window that is used to compute a weighted average for the given pixel. Should be odd (default: 21).
 
     Returns:
-        NumPy array: The denoised image.
+        The denoised image as a NumPy array.
     """
 +    # Ensure parameters are integers
 +    strength = int(strength)
@@ -22,8 +25,9 @@ def reduce_noise(image: np.ndarray, strength: float = 10.0, color_strength: floa
         image,
         None,
 
-         template_window_size,
-         search_window_size,
-     )
--    return denoised_image
-+    return denoised_image
+        strength,
+        color_strength,
+        template_window_size,
+        search_window_size,
+    )
+    return denoised_image
