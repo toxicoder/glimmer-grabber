@@ -93,17 +93,17 @@ class TestCardSegmenter(unittest.TestCase):
         # Test with saving disabled
         mock_config_manager.get_save_segmented_images.return_value = False
         with tempfile.TemporaryDirectory() as temp_dir:
-             mock_config_manager.get_save_segmented_images_path.return_value = temp_dir
-             with patch("src.core.card_segmenter.YOLO", return_value=mock_yolo), \
-                     patch("src.core.card_segmenter.CardSegmenter.identify_card_name", mock_identify_card_name), \
-                     patch("src.core.card_segmenter.ConfigManager", return_value=mock_config_manager):
+            mock_config_manager.get_save_segmented_images_path.return_value = temp_dir
+            with patch("src.core.card_segmenter.YOLO", return_value=mock_yolo), \
+                    patch("src.core.card_segmenter.CardSegmenter.identify_card_name", mock_identify_card_name), \
+                    patch("src.core.card_segmenter.ConfigManager", return_value=mock_config_manager):
 
-                 segmenter = CardSegmenter()
-                 image = np.zeros((100, 100, 3), dtype=np.uint8)
-                 segmenter.segment_cards(image)
+                segmenter = CardSegmenter()
+                image = np.zeros((100, 100, 3), dtype=np.uint8)
+                segmenter.segment_cards(image)
 
-                 # Assert that no files were created
-                 self.assertEqual(len(os.listdir(temp_dir)), 0)
+                # Assert that no files were created
+                self.assertEqual(len(os.listdir(temp_dir)), 0)
 
 if __name__ == '__main__':
     unittest.main()

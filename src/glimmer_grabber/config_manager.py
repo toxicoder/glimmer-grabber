@@ -1,6 +1,9 @@
 import json
 from typing import Optional, Any, Dict
 
+AppConfig = Dict[str, Any]
+CLIArgs = Optional[Dict[str, Any]]
+
 class ConfigManager:
     """
     Manages application configuration settings loaded from a JSON file,
@@ -10,7 +13,7 @@ class ConfigManager:
         config (dict): A dictionary holding the configuration settings.
         cli_args (dict): A dictionary holding the CLI arguments.
     """
-    def __init__(self, config_file: str = "config.json", cli_args: Optional[Dict[str, Any]] = None) -> None:
+    def __init__(self, config_file: str = "config.json", cli_args: CLIArgs = None) -> None:
         """
         Initializes the ConfigManager by loading settings from the specified JSON file
         and updating them with CLI arguments.
@@ -23,8 +26,8 @@ class ConfigManager:
             FileNotFoundError: If the configuration file does not exist.
             json.JSONDecodeError: If the configuration file contains invalid JSON.
         """
-        self.config: Dict[str, Any] = {}
-        self.cli_args: Dict[str, Any] = {} if cli_args is None else cli_args
+        self.config: AppConfig = {}
+        self.cli_args: AppConfig = {} if cli_args is None else cli_args
 
         try:
             with open(config_file, "r") as f:
@@ -36,7 +39,7 @@ class ConfigManager:
 
         self.update_with_cli_args(self.cli_args)
 
-    def update_with_cli_args(self, cli_args: Dict[str, Any]) -> None:
+    def update_with_cli_args(self, cli_args: AppConfig) -> None:
         """
         Updates the configuration with values from CLI arguments, giving them priority.
 
@@ -44,7 +47,7 @@ class ConfigManager:
             cli_args (Dict[str, Any]): A dictionary of CLI arguments.
         """
         # Map CLI argument names to config keys. Adjust as necessary to match your CLI arguments.
-        arg_mapping = {
+        arg_mapping: Dict[str, str] = {
             "input_dir": "input_path",
             "output_dir": "output_path",  # Assuming you might add this CLI argument later
             "threshold": "threshold",

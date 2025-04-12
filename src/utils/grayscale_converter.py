@@ -12,5 +12,4 @@ def convert_to_grayscale(image: np.ndarray) -> np.ndarray:
     Returns:
         np.ndarray: The grayscale image as a NumPy array.
     """
-    gray_image: np.ndarray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    return gray_image
+    return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)

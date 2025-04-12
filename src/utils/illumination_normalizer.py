@@ -19,5 +19,4 @@ def normalize_illumination(image: np.ndarray, clip_limit: float = 2.0, tile_grid
     clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_grid_size)
     cl: np.ndarray = clahe.apply(l)
     limg: np.ndarray = cv2.merge((cl, a, b))
-    normalized_image: np.ndarray = cv2.cvtColor(limg, cv2.COLOR_Lab2BGR)
-    return normalized_image
+    return cv2.cvtColor(limg, cv2.COLOR_Lab2BGR)
