@@ -3,7 +3,7 @@ from unittest.mock import patch, mock_open
 import json
 import os
 import time
-from card_data_fetcher import CardDataFetcher
+from src.glimmer_grabber.card_data_fetcher import CardDataFetcher
 
 class TestCardDataFetcher(unittest.TestCase):
     def setUp(self):

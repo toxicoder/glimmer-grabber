@@ -3,7 +3,7 @@ import glob
 import os
 import numpy as np
 from typing import List, Iterator
-from config_manager import ConfigManager
+from .config_manager import ConfigManager
 
 def read_images_from_folder() -> List[np.ndarray]:
     """
