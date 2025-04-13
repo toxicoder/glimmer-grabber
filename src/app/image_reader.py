@@ -4,6 +4,7 @@ import os
 import numpy as np
 from typing import List, Iterator, Optional
 from .config_manager import ConfigManager
+"""Reads image files from a directory."""
 
 def read_images_from_folder() -> List[np.ndarray]:
     """Reads image files from the input directory specified in the configuration.

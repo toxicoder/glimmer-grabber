@@ -2,6 +2,7 @@ import json
 import json
 from typing import Optional, Any, Dict
 from .cli_args_parser import CLIArgsParser
+"""Manages application configuration settings."""
 
 AppConfig = Dict[str, Any]
 

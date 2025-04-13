@@ -1,6 +1,7 @@
 import cv2
 import os
 from typing import List, Optional, Dict
+"""Processes images to segment cards."""
 
 from src.core.card_segmenter import CardSegmenter
 

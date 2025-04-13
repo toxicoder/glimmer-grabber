@@ -4,6 +4,7 @@ from src.utils.contrast_checker import check_low_contrast
 from src.utils.grayscale_converter import convert_to_grayscale
 import numpy as np
 from typing import Dict, Any
+"""Preprocesses images for further processing."""
 
 PreprocessingConfig = Dict[str, Dict[str, Any]]
 
