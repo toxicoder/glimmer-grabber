@@ -1,6 +1,8 @@
-from .card_segmenter import CardSegmenter
 import numpy as np
 from typing import List, Dict, Any
+import logging
+
+logger = logging.getLogger(__name__)
 
 def run_inference(image: np.ndarray, segmenter: CardSegmenter) -> List[Dict[str, Any]]:
     """Runs inference on a preprocessed image using the CardSegmenter.
@@ -28,5 +30,5 @@ def run_inference(image: np.ndarray, segmenter: CardSegmenter) -> List[Dict[str,
     try:
         return segmenter.segment_cards(image)
     except Exception as e:
-        print(f"Error during inference: {e}")
-        return []
+        logger.exception(f"Error during inference: {e}")
+        return [{"error": f"Inference failed: {e}"}]

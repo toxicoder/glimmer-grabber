@@ -27,16 +27,15 @@ def process_images(image_files: List[str], output_path: str, save_segmented_imag
 
     with open(os.path.join("data", "processed_images.log"), "a") as f:
         for image_path in image_files:
-            #if image_path in processed_images:  # This will be handled in cli.py
-            #    print(f"Skipping already processed image: {image_path}")
-            #    continue
-
             print(f"Processing image: {image_path}")
             try:
                 # Read the image using cv2
                 image: Optional[cv2.Mat] = cv2.imread(image_path)
                 if image is None:
-                    print(f"Error: Could not read image at {image_path}")
+                    if not os.path.exists(image_path):
+                        print(f"Error: Could not read image at {image_path}: File not found.")
+                    else:
+                        print(f"Error: Could not read image at {image_path}: Unsupported format or corrupted file.")
                     continue
 
                 # Perform card segmentation
