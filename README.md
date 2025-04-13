@@ -32,9 +32,19 @@ glimmer-grabber offers a user-friendly and efficient approach to digitizing and 
 - Python 3.7+
 - pip
 
-### Installation
+### Installation (Recommended)
 
 1.  **Clone the repository:** `git clone <repository_url>` (Replace `<repository_url>` with the actual repository URL).
+
+2.  **Create a virtual environment:** `python3 -m venv .venv`
+
+3.  **Activate the virtual environment:** `source .venv/bin/activate` (or `.venv\Scripts\activate` on Windows)
+
+4.  **Install the package:** `pip install .`
+
+3.  **Activate the virtual environment.** Activate the environment before installing the package.
+
+4.  **Install the package:** Use pip to install the required dependencies.
 
 ## Usage
 
