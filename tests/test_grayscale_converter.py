@@ -5,7 +5,16 @@ from src.utils.grayscale_converter import convert_to_grayscale
 from typing import Tuple
 
 class TestGrayscaleConverter(unittest.TestCase):
+    """Tests for the grayscale conversion utility."""
     def test_convert_to_grayscale(self) -> None:
+        """Test conversion to grayscale.
+
+        This test checks if the function correctly converts a BGR image to grayscale.
+        It creates a dummy color image, converts it to grayscale using the function,
+        and then verifies that the output is a 2D grayscale image with the correct
+        dimensions and data type. It also compares the result with OpenCV's grayscale
+        conversion to ensure correctness.
+        """
         # Create a dummy color image
         image: np.ndarray = np.zeros((100, 100, 3), dtype=np.uint8)
         image[:, :, 0] = 255  # Blue channel

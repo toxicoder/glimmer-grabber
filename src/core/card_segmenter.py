@@ -7,7 +7,20 @@ import os
 import re
 
 class CardSegmenter:
-    """Segments cards from an image using a YOLOv8 segmentation model."""
+    """Segments cards from an image using a YOLOv8 segmentation model.
+
+    Card Segmentation Process:
+    1. The input image is passed to the YOLOv8 model for object detection and segmentation.
+    2. YOLOv8 identifies potential card instances and provides segmentation masks and bounding boxes.
+    3. For each detected instance, a binary mask is created to isolate the card from the background.
+    4. The bounding box is used to crop the card image from the original image.
+    5. The cropped image is then passed to the card name identification module.
+
+    YOLO Model:
+    - The `CardSegmenter` uses a YOLOv8 segmentation model (`yolov8n-seg.pt` by default).
+    - YOLO (You Only Look Once) is a real-time object detection system that divides an image into a grid and predicts bounding boxes and class probabilities for each grid cell.
+    - The 'segmentation' version (YOLOv8-seg) extends this by also predicting a segmentation mask for each detected object, allowing for pixel-level separation of objects from the background.
+    """
 
     def __init__(self, model_path: str = "yolov8n-seg.pt") -> None:
         """Initializes the CardSegmenter with a YOLOv8-seg model.
@@ -73,6 +86,13 @@ class CardSegmenter:
 
     def identify_card_name(self, image: np.ndarray) -> str:
         """Identifies the card name from an image using OCR.
+
+        Card Name Identification Logic:
+        1. The segmented card image is converted to grayscale.
+        2. Thresholding is applied to create a binary image, enhancing text contrast.
+        3. Tesseract OCR is used to extract text from the preprocessed image.
+        4. The extracted text is stripped of leading/trailing whitespace.
+        5. If text is extracted, it is returned as the card name; otherwise, "Unknown Card" is returned.
 
         Args:
             image: The segmented card image.

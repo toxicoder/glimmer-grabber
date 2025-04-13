@@ -6,8 +6,11 @@ from typing import List, Iterator, Optional
 from .config_manager import ConfigManager
 
 def read_images_from_folder() -> List[np.ndarray]:
-    """Reads image files (JPG, JPEG, PNG) from the input directory specified in the configuration.
-    Handles crawling of subdirectories based on the configuration.
+    """Reads image files from the input directory specified in the configuration.
+
+    This function reads image files (with extensions .jpg, .jpeg, or .png) from the
+    input directory specified in the application's configuration. It can also
+    crawl subdirectories for images if the configuration allows.
 
     Returns:
         A list of images as NumPy arrays.
@@ -43,6 +46,9 @@ def read_images_from_folder() -> List[np.ndarray]:
 
 def iterate_images(image_list: List[np.ndarray]) -> Iterator[np.ndarray]:
     """Iterates through a list of images.
+
+    This function provides an iterator for a list of images, allowing for sequential
+    access to each image in the list.
 
     Args:
         image_list: A list of images as NumPy arrays.

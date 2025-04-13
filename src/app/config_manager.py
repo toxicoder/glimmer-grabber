@@ -6,14 +6,20 @@ from .cli_args_parser import CLIArgsParser
 AppConfig = Dict[str, Any]
 
 class ConfigManager:
-    """Manages application configuration settings loaded from a JSON file,
-    prioritizing CLI arguments over the configuration file.
+    """Manages application configuration settings.
+
+    This class handles loading configuration settings from a JSON file and updating them
+    with command-line arguments. Command-line arguments take precedence over settings
+    from the configuration file.
 
     Attributes:
         config: A dictionary holding the configuration settings.
     """
     def __init__(self, config_file: str = "config.json") -> None:  # Removed cli_args from here
-        """Initializes the ConfigManager by loading settings from the specified JSON file.
+        """Initializes the ConfigManager.
+
+        Loads settings from the specified JSON file and updates them with any provided
+        command-line arguments.
 
         Args:
             config_file: The path to the JSON configuration file. Defaults to "config.json".
@@ -37,16 +43,18 @@ class ConfigManager:
         self.update_with_cli_args(cli_config)  # Update configuration with CLI arguments
 
     def update_with_cli_args(self, cli_config: AppConfig) -> None:  # Modified this to use cli_config
-        """Updates the configuration with values from CLI arguments, giving them priority.
+        """Updates the configuration with values from command-line arguments.
+
+        Command-line arguments take precedence over settings loaded from the configuration file.
 
         Args:
-            cli_config: A dictionary of CLI arguments mapped to configuration keys.  # Modified this docstring
+            cli_config: A dictionary of command-line arguments mapped to configuration keys.  # Modified this docstring
         """
         for key, value in cli_config.items():
             self.config[key] = value
 
     def get_input_path(self) -> Optional[str]:
-        """Retrieves the input path, prioritizing CLI arguments over the configuration file.
+        """Retrieves the input path.
 
         Returns:
             The input path as a string, or None if not found.
@@ -54,7 +62,7 @@ class ConfigManager:
         return self.config.get("input_path")
 
     def get_output_path(self) -> Optional[str]:
-        """Retrieves the output path, prioritizing CLI arguments over the configuration file.
+        """Retrieves the output path.
 
         Returns:
             The output path as a string, or None if not found.
@@ -62,7 +70,7 @@ class ConfigManager:
         return self.config.get("output_path")
 
     def get_threshold(self) -> Optional[float]:
-        """Retrieves the processing threshold, prioritizing CLI arguments over the configuration file.
+        """Retrieves the processing threshold.
 
         Returns:
             The threshold as a float, or None if not found.
@@ -70,7 +78,7 @@ class ConfigManager:
         return self.config.get("threshold")
 
     def get_api_key(self) -> Optional[str]:
-        """Retrieves the API key, prioritizing CLI arguments over the configuration file.
+        """Retrieves the API key.
 
         Returns:
             The API key as a string, or None if not found.
@@ -78,7 +86,7 @@ class ConfigManager:
         return self.config.get("api_key")
 
     def get_keep_split_card_images(self) -> Optional[bool]:
-        """Retrieves the keep_split_card_images setting, prioritizing CLI arguments over the configuration file.
+        """Retrieves the setting for keeping split card images.
 
         Returns:
             The setting as a bool, or None if not found.
@@ -86,7 +94,7 @@ class ConfigManager:
         return self.config.get("keep_split_card_images")
 
     def get_crawl_directories(self) -> Optional[bool]:
-        """Retrieves the crawl_directories setting, prioritizing CLI arguments over the configuration file.
+        """Retrieves the setting for crawling subdirectories.
 
         Returns:
             The setting as a bool, or None if not found.
@@ -94,7 +102,7 @@ class ConfigManager:
         return self.config.get("crawl_directories")
 
     def get_save_segmented_images_path(self) -> Optional[str]:
-        """Retrieves the path to save segmented card images, prioritizing CLI arguments over the configuration file.
+        """Retrieves the path for saving segmented card images.
 
         Returns:
             The path as a string, or None if not found.
@@ -102,7 +110,7 @@ class ConfigManager:
         return self.config.get("save_segmented_images_path")
 
     def get_save_segmented_images(self) -> Optional[bool]:
-        """Retrieves the save_segmented_images setting, prioritizing CLI arguments over the configuration file.
+        """Retrieves the setting for saving segmented card images.
 
         Returns:
             The setting as a bool, or None if not found.

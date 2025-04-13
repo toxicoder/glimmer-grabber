@@ -3,7 +3,14 @@ from typing import Optional
 from glimmer_grabber.config_manager import ConfigManager
 
 class TestConfigManager(unittest.TestCase):
+    """Tests for the ConfigManager class."""
     def test_config_values(self) -> None:
+        """Test retrieval of configuration values.
+
+        This test verifies that the ConfigManager correctly retrieves configuration
+        values from the config.json file. It checks the values for input path,
+        output path, threshold, and API key.
+        """
         config_manager: ConfigManager = ConfigManager()
         self.assertEqual(config_manager.get_input_path(), "data/input")
         self.assertEqual(config_manager.get_output_path(), "data/output")
