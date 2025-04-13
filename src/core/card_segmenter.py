@@ -5,6 +5,7 @@ from .config_manager import ConfigManager
 import pytesseract
 import os
 import re
+import logging
 
 class CardSegmenter:
     """Segments cards from an image using a YOLOv8 segmentation model.
@@ -22,20 +23,25 @@ class CardSegmenter:
     - The 'segmentation' version (YOLOv8-seg) extends this by also predicting a segmentation mask for each detected object, allowing for pixel-level separation of objects from the background.
     """
 
-    def __init__(self, model_path: str = "yolov8n-seg.pt") -> None:
+    def __init__(self, model_path: str = "yolov8n-seg.pt", config_manager: Optional[ConfigManager] = None) -> None:
         """Initializes the CardSegmenter with a YOLOv8-seg model.
 
         Args:
-            model_path: Path to the YOLOv8-seg model file (default: yolov8n-seg.pt).
-
-        Raises:
-            ImportError: If the 'ultralytics' package is not installed.
+            model_path: Path to the YOLOv8-seg model file (default: "yolov8n-seg.pt").
+            config_manager: An optional ConfigManager instance. If None, a default ConfigManager will be created.
         """
         try:
             from ultralytics import YOLO
             self.model = YOLO(model_path)
         except ImportError:
             raise ImportError("Please install the 'ultralytics' package to use YOLOv8.")
+
+        if config_manager is None:
+            self.config_manager = ConfigManager()
+        else:
+            self.config_manager = config_manager
+
+        self.logger = logging.getLogger(__name__)
 
     def segment_cards(self, image: np.ndarray) -> List[Dict[str, Any]]:
         """Detects and segments cards in an image.
@@ -54,8 +60,7 @@ class CardSegmenter:
         Raises:
             Exception: If an error occurs during segmentation.
         """
-        config_manager = ConfigManager()
-        keep_split_card_images: bool = config_manager.get_keep_split_card_images()
+        keep_split_card_images: bool = self.config_manager.get_keep_split_card_images()
         try:
             results = self.model.predict(image)
             if results:
@@ -72,9 +77,8 @@ class CardSegmenter:
                     card_name: str = self.identify_card_name(segmented_image)
                     segmentation["card_name"] = card_name
                     segmentations.append(segmentation)
-                config_manager = ConfigManager()
-                if config_manager.get_save_segmented_images():
-                    output_dir: Optional[str] = config_manager.get_save_segmented_images_path()
+                if self.config_manager.get_save_segmented_images():
+                    output_dir: Optional[str] = self.config_manager.get_save_segmented_images_path()
                     if output_dir:
                         self.save_segmented_cards(segmentations, output_dir)
                 return segmentations
@@ -89,10 +93,12 @@ class CardSegmenter:
 
         Card Name Identification Logic:
         1. The segmented card image is converted to grayscale.
-        2. Thresholding is applied to create a binary image, enhancing text contrast.
-        3. Tesseract OCR is used to extract text from the preprocessed image.
-        4. The extracted text is stripped of leading/trailing whitespace.
-        5. If text is extracted, it is returned as the card name; otherwise, "Unknown Card" is returned.
+        2. Apply CLAHE for contrast enhancement.
+        3. Apply median blur for noise reduction.
+        4. Apply adaptive thresholding to handle varying lighting conditions.
+        5. Tesseract OCR is used to extract text from the preprocessed image.
+        6. The extracted text is stripped of leading/trailing whitespace.
+        7. If text is extracted, it is returned as the card name; otherwise, "Unknown Card" is returned.
 
         Args:
             image: The segmented card image.
@@ -102,16 +108,22 @@ class CardSegmenter:
         """
         try:
             gray: np.ndarray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-            # Adding some preprocessing to improve OCR accuracy
-            thresh: np.ndarray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+            # Apply CLAHE for contrast enhancement
+            clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+            cl1 = clahe.apply(gray)
+            # Apply median blur for noise reduction
+            blurred: np.ndarray = cv2.medianBlur(cl1, 3)
+            # Apply adaptive thresholding
+            thresh: np.ndarray = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                                          cv2.THRESH_BINARY_INV, 11, 2)
             text: str = pytesseract.image_to_string(thresh).strip()
             if text:
                 return text
             else:
                 return "Unknown Card"
         except Exception as e:
-            print(f"Error during card name identification: {e}")
-            return "Unknown Card"
+            self.logger.error(f"Error during card name identification: {e}")
+            return f"Error identifying card name: {e}"
 
     def save_segmented_cards(self, segmentations: List[Dict[str, Any]], output_dir: str) -> None:
         """Saves the segmented card images to the specified directory.
