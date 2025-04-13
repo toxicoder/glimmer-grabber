@@ -1,5 +1,6 @@
 import argparse
 from typing import Dict, Any
+"""Parses command-line arguments for the application."""
 
 AppConfig = Dict[str, Any]
 

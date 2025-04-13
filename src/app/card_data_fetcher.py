@@ -3,6 +3,7 @@ import json
 import time
 import os
 from typing import List, Dict, Any
+"""Fetches card data from an API and manages a local cache."""
 
 CardData = List[Dict[str, Any]]
 

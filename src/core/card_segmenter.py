@@ -6,6 +6,7 @@ import pytesseract
 import os
 import re
 import logging
+"""Segments cards from an image."""
 
 class CardSegmenter:
     """Segments cards from an image using a YOLOv8 segmentation model.

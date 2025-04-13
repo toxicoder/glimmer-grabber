@@ -8,6 +8,7 @@ from .config_manager import ConfigManager
 from .image_reader import read_images_from_folder
 from src.core.image_processor import process_images
 from .card_data_fetcher import fetch_card_data  # Import the card_data_fetcher
+"""Command-line interface for the card processing application."""
 
 def load_processed_images() -> List[str]:
     history_file: str = os.path.join("data", "processed_images.log")
