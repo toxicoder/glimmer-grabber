@@ -11,7 +11,7 @@ glimmer-grabber is a tool designed to help users digitize their Lorcana trading 
 - **Image capture:** Capturing high-quality images of individual Lorcana cards.
 - **Card identification:** Identifying the card name, set, and other relevant information from the captured image.
 - **Data management:** Storing and organizing digitized card data, including images and metadata.
-- **Export:** Exporting the digitized card collection data in various formats (e.g., CSV, JSON).
+- **Export:** Exporting the digitized card collection data in various formats (e.g., CSV, JSON). The exported CSV file will be named `lorcana_collection_{n}.csv`, where `n` is an incrementing number to avoid overwriting existing files.
 
 ## Problem Solved
 
