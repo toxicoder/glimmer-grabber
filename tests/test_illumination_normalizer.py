@@ -5,7 +5,15 @@ from src.utils.illumination_normalizer import normalize_illumination
 from typing import Tuple
 
 class TestIlluminationNormalizer(unittest.TestCase):
+    """Tests for the illumination normalization utility."""
     def test_normalize_illumination(self) -> None:
+        """Test illumination normalization.
+
+        This test checks if the function applies illumination normalization to an image
+        without changing its dimensions or data type. It creates a dummy image with
+        an illumination gradient, applies the normalization, and then verifies that
+        the output image has the same shape and data type as the input.
+        """
         # Create a dummy image with some illumination variation
         image: np.ndarray = np.zeros((100, 100, 3), dtype=np.uint8)
         gradient: np.ndarray = np.linspace(0, 255, 100, dtype=np.uint8)

@@ -10,8 +10,13 @@ PreprocessingConfig = Dict[str, Dict[str, Any]]
 class ImagePreprocessor:
     """Preprocesses images by applying a series of transformations based on a configuration.
 
+    This class applies a sequence of preprocessing steps to an image, such as noise reduction,
+    illumination normalization, and grayscale conversion. The specific steps and their
+    parameters are determined by a configuration dictionary.
+
     Attributes:
         config: A dictionary containing the preprocessing configuration.
+            It should have a "steps" key with a dictionary of step names and their parameters.
         steps: A dictionary mapping preprocessing step names to their corresponding functions.
     """
     def __init__(self, config: PreprocessingConfig) -> None:
@@ -30,6 +35,8 @@ class ImagePreprocessor:
 
     def preprocess(self, image: np.ndarray) -> np.ndarray:
         """Applies the configured preprocessing steps to an image.
+
+        The preprocessing steps are applied in the order they appear in the configuration.
 
         Args:
             image: The input image as a NumPy array.
@@ -50,6 +57,9 @@ class ImagePreprocessor:
 
     def check_contrast(self, image: np.ndarray) -> bool:
         """Checks the contrast of an image.
+
+        This method checks if the image has low contrast based on a threshold specified
+        in the configuration.
 
         Args:
             image: The input image as a NumPy array.

@@ -31,7 +31,17 @@ def parse_arguments() -> argparse.Namespace:
     return parser.parse_args()
 
 def main() -> None:
-    """Main function to handle command-line arguments and process images."""
+    """
+    Main function to handle command-line arguments and process images.
+
+    Program Flow:
+    1. Parses command-line arguments using the `parse_arguments` function.
+    2. Initializes a `ConfigManager` with the parsed arguments.
+    3. Retrieves configuration values (input path, output path, etc.) from the `ConfigManager`.
+    4. Prints the configuration settings being used.
+    5. Reads image files from the specified input directory using `read_images_from_folder`.
+    6. Processes the images using the `process_images` function, saving results to the output directory.
+    """
     args: argparse.Namespace = parse_arguments()  # Type hint already present
     config_manager: ConfigManager = ConfigManager(cli_args=args)
 

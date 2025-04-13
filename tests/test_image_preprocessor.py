@@ -4,7 +4,15 @@ import numpy as np
 from src.core.image_preprocessor import ImagePreprocessor
 
 class TestImagePreprocessor(unittest.TestCase):
+    """Tests for the ImagePreprocessor class."""
     def test_preprocess_with_all_steps(self):
+        """Test preprocessing with all steps enabled.
+
+        This test checks if the ImagePreprocessor correctly applies all configured
+        preprocessing steps (noise reduction, illumination normalization, and grayscale
+        conversion) to an image. It verifies that the output image is grayscale (2D)
+        after preprocessing.
+        """
         # Create a dummy image
         image = np.zeros((100, 100, 3), dtype=np.uint8)
 
@@ -28,6 +36,13 @@ class TestImagePreprocessor(unittest.TestCase):
         self.assertEqual(len(processed_image.shape), 2)
 
     def test_preprocess_with_some_steps(self):
+        """Test preprocessing with a subset of steps enabled.
+
+        This test checks if the ImagePreprocessor correctly applies a subset of the
+        configured preprocessing steps (noise reduction and illumination normalization)
+        to an image. It verifies that the output image remains in color (3D) after
+        preprocessing, as grayscale conversion is not included.
+        """
         # Create a dummy image
         image = np.zeros((100, 100, 3), dtype=np.uint8)
 
@@ -50,6 +65,13 @@ class TestImagePreprocessor(unittest.TestCase):
         self.assertEqual(len(processed_image.shape), 3)
 
     def test_check_contrast(self):
+        """Test the contrast checking functionality.
+
+        This test checks if the ImagePreprocessor correctly assesses the contrast of
+        images. It uses a low contrast image and a high contrast image, and verifies
+        that the check_contrast method returns True for the low contrast image and
+        False for the high contrast image, based on the configured threshold.
+        """
         # Create a dummy low contrast image
         low_contrast_image = np.full((100, 100, 3), 128, dtype=np.uint8)
 

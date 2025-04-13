@@ -9,6 +9,9 @@ CardData = List[Dict[str, Any]]
 class CardDataFetcher:
     """Fetches card data from a specified API with caching.
 
+    This class handles fetching card data from an API, caching the data locally to reduce API calls,
+    and validating the fetched data.
+
     Attributes:
         api_url: The URL of the API to fetch data from. Defaults to "https://lorcanajson.org/".
         cache_file: The path to the cache file. Defaults to "card_data_cache.json".
@@ -75,6 +78,9 @@ class CardDataFetcher:
     def fetch_card_data(self) -> bool:  # Corrected type hint
         """Fetches card data from the API or loads it from the cache if available and valid.
 
+        This method first checks if a valid cache exists. If so, it loads the data from the cache.
+        Otherwise, it fetches the data from the API and saves it to the cache for future use.
+
         Returns:
             True if data fetching or loading was successful, False otherwise.
         """
@@ -107,6 +113,8 @@ class CardDataFetcher:
     def validate_card_data(self, card: Dict[str, Any]) -> bool:
         """Validates a single card's data.
 
+        Performs basic validation to ensure that the card data contains the required fields.
+
         Args:
             card: A dictionary representing a card's data.
 
@@ -123,6 +131,8 @@ class CardDataFetcher:
 
     def load_and_validate_data(self) -> bool:  # Corrected type hint
         """Loads and validates card data, using the cache if available.
+
+        This method combines fetching (or loading from cache) and validating the card data.
 
         Returns:
             True if data loading and validation were successful, False otherwise.

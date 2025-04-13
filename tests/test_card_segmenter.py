@@ -7,9 +7,14 @@ import shutil
 import os
 
 class TestCardSegmenter(unittest.TestCase):
+    """Tests for the CardSegmenter class."""
 
     def _create_mock_yolo(self):
-        """Helper function to create a mock YOLO model."""
+        """Helper function to create a mock YOLO model.
+
+        This function creates a MagicMock object that simulates the behavior of the YOLO model,
+        returning a predefined set of results upon prediction.
+        """
         mock_yolo = MagicMock()
         mock_results = MagicMock()
         mock_masks = MagicMock()
@@ -25,6 +30,11 @@ class TestCardSegmenter(unittest.TestCase):
         return mock_yolo
 
     def test_segment_cards_no_detection(self):
+        """Test case for when no cards are detected in the image.
+
+        This test verifies that the segment_cards method returns an empty list when the
+        mocked YOLO model returns no detections.
+        """
         # Mock the YOLO model to return empty results
         mock_yolo = MagicMock()
         mock_yolo.predict.return_value = []
@@ -37,6 +47,12 @@ class TestCardSegmenter(unittest.TestCase):
             self.assertEqual(results, [])
 
     def test_segment_cards_with_detection(self):
+        """Test case for successful card detection and segmentation.
+
+        This test verifies that the segment_cards method returns a list containing a
+        dictionary with the expected keys ('mask', 'bbox') and values when the mocked
+        YOLO model returns a detection.
+        """
         # Mock the YOLO model to return dummy results
         mock_yolo = self._create_mock_yolo()
 
@@ -52,6 +68,11 @@ class TestCardSegmenter(unittest.TestCase):
             self.assertEqual(results[0]["bbox"], [10, 10, 90, 90])
 
     def test_segment_cards_error_handling(self):
+        """Test case for error handling during segmentation.
+
+        This test verifies that the segment_cards method returns an empty list when the
+        mocked YOLO model raises an exception during prediction.
+        """
         # Mock the YOLO model to raise an exception
         mock_yolo = MagicMock()
         mock_yolo.predict.side_effect = Exception("Segmentation error")
@@ -65,6 +86,13 @@ class TestCardSegmenter(unittest.TestCase):
             self.assertEqual(results, [])
 
     def test_segment_cards_with_renaming(self):
+        """Test case for saving segmented cards with renamed filenames.
+
+        This test verifies that the segment_cards method correctly saves segmented card
+        images with filenames based on the identified card names when saving is enabled
+        in the configuration. It also checks that no files are created when saving is
+        disabled.
+        """
         # Mock YOLO model
         mock_yolo = self._create_mock_yolo()
 
