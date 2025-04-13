@@ -41,7 +41,16 @@ def generate_csv(card_data: List[dict], output_path: str) -> None:
         card_data: A list of dictionaries, where each dictionary represents a card.
         output_path: The path to the output directory.
     """
-    csv_file_path: str = os.path.join(output_path, "card_data.csv")
+    n = 1
+    while True:
+        csv_file_path = os.path.join(output_path, f"lorcana_collection_{n}.csv")
+        if not os.path.exists(csv_file_path):
+            break
+        n += 1
+
+    # Generates a unique filename for the CSV output to prevent overwriting existing files.
+    # The filename follows the format "lorcana_collection_{n}.csv", where 'n' is an incrementing number.
+    # The function checks for existing files with this pattern and increments 'n' until a unique filename is found.
     if not os.path.exists(output_path):
         os.makedirs(output_path)
     with open(csv_file_path, mode="w", newline="", encoding="utf-8") as csvfile:
