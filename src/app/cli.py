@@ -3,7 +3,7 @@ import os
 from typing import List
 from .config_manager import ConfigManager
 from .image_reader import read_images_from_folder
-from .image_processor import process_images  # Import the new function
+from src.core.image_processor import process_images  # Import the new function
 
 def load_processed_images() -> List[str]:
     history_file: str = os.path.join("data", "processed_images.log")
