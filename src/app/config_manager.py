@@ -1,7 +1,7 @@
 import json
 import json
-from typing import Optional, Any, Dict
-from .cli_args_parser import CLIArgsParser
+from typing import Optional, Any, Dict, List
+import argparse
 """Manages application configuration settings."""
 
 AppConfig = Dict[str, Any]
@@ -16,7 +16,7 @@ class ConfigManager:
     Attributes:
         config: A dictionary holding the configuration settings.
     """
-    def __init__(self, config_file: str = "config.json") -> None:  # Removed cli_args from here
+    def __init__(self, config_file: str = "config.json", cli_args: Optional[argparse.Namespace] = None) -> None:
         """Initializes the ConfigManager.
 
         Loads settings from the specified JSON file and updates them with any provided
@@ -24,6 +24,7 @@ class ConfigManager:
 
         Args:
             config_file: The path to the JSON configuration file. Defaults to "config.json".
+            cli_args: Optional command-line arguments to override configuration file settings.
 
         Raises:
             FileNotFoundError: If the configuration file does not exist.

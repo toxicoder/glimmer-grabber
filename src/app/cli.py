@@ -19,21 +19,6 @@ def load_processed_images() -> List[str]:
 
 processed_images: List[str] = load_processed_images()
 
-def parse_arguments() -> argparse.Namespace:
-    """Parses command-line arguments.
-
-    Returns:
-        An argparse.Namespace object containing the parsed arguments.
-    """
-    parser: argparse.ArgumentParser = argparse.ArgumentParser(description="CLI for processing card images.")
-    parser.add_argument("input_dir", nargs='?', default="input", help="Path to the input directory.")
-    parser.add_argument("output_dir", nargs='?', default="output", help="Path to the output directory.")
-    parser.add_argument("--keep_split_card_images", action="store_true", help="Keep split card images.")
-    parser.add_argument("--crawl_directories", action="store_true", default=True, help="Crawl directories for images.")
-    parser.add_argument("--save_segmented_images", action="store_true", help="Save segmented card images.")
-    parser.add_argument("--save_segmented_images_path", help="Path to save segmented card images.")
-
-    return parser.parse_args()
 
 def generate_csv(card_data: List[dict], output_path: str) -> None:
     """Generates a CSV file from the fetched card data.
@@ -78,7 +63,7 @@ def main() -> None:
     7. Fetches card data based on the processed images.
     8. Generates a CSV file from the fetched card data and saves it to the output directory.
     """
-    args: argparse.Namespace = parse_arguments()
+    args: argparse.Namespace = CLIArgsParser().parse_arguments()
     config_manager: ConfigManager = ConfigManager(cli_args=args)
 
     input_path: str = config_manager.get_input_path()
