@@ -35,6 +35,7 @@ class TestHistoryLog(unittest.TestCase):
         self.output_dir = "test_output"
         os.makedirs(self.output_dir, exist_ok=True)
         self.history_file = os.path.join("data", "processed_images.log")  # Updated history file path
+        os.system("./create_venv.sh")  # Execute the script to create the virtual environment
 
     def tearDown(self):
         shutil.rmtree(self.output_dir)

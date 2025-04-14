@@ -101,6 +101,8 @@ tmp/mypy/
 .env/
 venv/
 
+venv
+
 # System-related files
 .DS_Store
 
