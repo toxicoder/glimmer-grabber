@@ -76,17 +76,25 @@ class CardDataFetcher:
             print(f"Error saving to cache: {e}")
             return False
 
-    def fetch_card_data(self) -> bool:  # Corrected type hint
+    def fetch_card_data(self, card_names: List[str] = []) -> List[Dict[str, Any]]:
         """Fetches card data from the API or loads it from the cache if available and valid.
 
         This method first checks if a valid cache exists. If so, it loads the data from the cache.
         Otherwise, it fetches the data from the API and saves it to the cache for future use.
+        If card_names are provided, it filters the data to include only those cards.
+
+        Args:
+            card_names: A list of card names to filter the results.  If empty, all cards are returned.
 
         Returns:
-            True if data fetching or loading was successful, False otherwise.
+            A list of card data dictionaries, filtered by card_names if provided.
         """
         if self._is_cache_valid() and self._load_from_cache():
-            return True
+            if not card_names:
+                return self.card_data
+            else:
+                return [card for card in self.card_data if card.get("name") in card_names]
+
 
         try:
             response: requests.Response = requests.get(self.api_url + "cards.json")
@@ -95,13 +103,16 @@ class CardDataFetcher:
             if isinstance(data, list):
                 self.card_data = data
                 self._save_to_cache()  # Save the fetched data to the cache
-                return True
+                if not card_names:
+                    return self.card_data
+                else:
+                    return [card for card in self.card_data if card.get("name") in card_names]
             else:
                 print("Error: Invalid response format from API.")
-                return False
+                return []
         except requests.exceptions.RequestException as e:
             print(f"Error fetching card data: {e}")
-            return False
+            return []
 
     def get_card_data(self) -> CardData:
         """Returns the fetched card data.
@@ -130,15 +141,19 @@ class CardDataFetcher:
                 return False
         return True
 
-    def load_and_validate_data(self) -> bool:  # Corrected type hint
+    def load_and_validate_data(self, card_names: List[str] = []) -> bool:
         """Loads and validates card data, using the cache if available.
 
         This method combines fetching (or loading from cache) and validating the card data.
 
+        Args:
+            card_names: A list of card names to filter the results. If empty, all cards are loaded and validated.
+
         Returns:
             True if data loading and validation were successful, False otherwise.
         """
-        if self.fetch_card_data():  # This now uses the cache
+        self.card_data = self.fetch_card_data(card_names)
+        if self.card_data:
             validated_data: CardData = []
             for card in self.card_data:
                 if self.validate_card_data(card):

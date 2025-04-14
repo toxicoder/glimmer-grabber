@@ -63,6 +63,20 @@ class TestCardDataFetcher(unittest.TestCase):
         self.assertTrue(self.fetcher.load_and_validate_data())
         self.assertEqual(len(self.fetcher.get_card_data()), 1)  # Only one valid card
 
+    @patch('requests.get')
+    def test_load_and_validate_data_with_names(self, mock_get: MagicMock) -> None:
+        """Test loading and validating data with a list of card names."""
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = [
+            {"name": "Card 1", "type": "Action", "set": "Set 1"},
+            {"name": "Card 2", "type": "Character", "set": "Set 2"},
+            {"name": "Card 3", "type": "Item", "set": "Set 1"},
+        ]
+        card_names: List[str] = ["Card 1", "Card 3"]
+        self.assertTrue(self.fetcher.load_and_validate_data(card_names))
+        self.assertEqual(len(self.fetcher.get_card_data()), 2)
+        self.assertEqual([card["name"] for card in self.fetcher.get_card_data()], card_names)
+
     @patch('os.path.exists')
     @patch('time.time')
     @patch('os.path.getmtime')
@@ -84,6 +98,40 @@ class TestCardDataFetcher(unittest.TestCase):
         self.fetcher.fetch_card_data()
         mock_file.assert_called_once_with(self.cache_file, "w")
         mock_file.return_value.write.assert_called_once_with(json.dumps(self.mock_card_data))
+
+    @patch('requests.get')
+    def test_fetch_card_data_with_names(self, mock_get: MagicMock) -> None:
+        """Test fetching card data with a list of card names."""
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = [
+            {"name": "Card 1", "type": "Action", "set": "Set 1"},
+            {"name": "Card 2", "type": "Character", "set": "Set 2"},
+            {"name": "Card 3", "type": "Item", "set": "Set 1"},
+        ]
+        card_names: List[str] = ["Card 1", "Card 3"]
+        expected_data: List[Dict[str, Any]] = [
+            {"name": "Card 1", "type": "Action", "set": "Set 1"},
+            {"name": "Card 3", "type": "Item", "set": "Set 1"},
+        ]
+        actual_data: List[Dict[str, Any]] = self.fetcher.fetch_card_data(card_names)
+        self.assertEqual(actual_data, expected_data)
+
+    @patch('requests.get')
+    def test_fetch_card_data_with_empty_names(self, mock_get: MagicMock) -> None:
+        """Test fetching card data with an empty list of card names."""
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = [
+            {"name": "Card 1", "type": "Action", "set": "Set 1"},
+            {"name": "Card 2", "type": "Character", "set": "Set 2"},
+            {"name": "Card 3", "type": "Item", "set": "Set 1"},
+        ]
+        expected_data: List[Dict[str, Any]] = [
+            {"name": "Card 1", "type": "Action", "set": "Set 1"},
+            {"name": "Card 2", "type": "Character", "set": "Set 2"},
+            {"name": "Card 3", "type": "Item", "set": "Set 1"},
+        ]
+        actual_data: List[Dict[str, Any]] = self.fetcher.fetch_card_data([])
+        self.assertEqual(actual_data, expected_data)
 
 if __name__ == "__main__":
     unittest.main()

@@ -7,7 +7,7 @@ from typing import List
 from .config_manager import ConfigManager
 from .image_reader import read_images_from_folder
 from src.core.image_processor import process_images
-from .card_data_fetcher import fetch_card_data  # Import the card_data_fetcher
+from .card_data_fetcher import CardDataFetcher  # Import the CardDataFetcher class
 """Command-line interface for the card processing application."""
 
 def load_processed_images() -> List[str]:
@@ -83,10 +83,22 @@ def main() -> None:
     image_files: List[str] = read_images_from_folder()
 
     # Call the process_images function and get the processed data
-    processed_images = process_images(image_files, output_path, save_segmented_images, save_segmented_images_path)
+    processed_data = process_images(image_files, output_path, save_segmented_images, save_segmented_images_path)
+
+    # Extract card names from processed data
+    card_names: List[str] = []
+    for data in processed_data:
+        if data["segmentations"]:  # Check if segmentation data is available
+            # Assuming segmentations is a list of dictionaries, each with a "name" key
+            for segmentation in data["segmentations"]:
+                if "name" in segmentation:
+                    card_names.append(segmentation["name"])
+
+    # Create an instance of CardDataFetcher
+    card_data_fetcher: CardDataFetcher = CardDataFetcher()
 
     # Fetch card data using the processed data
-    card_data: List[dict] = fetch_card_data(processed_images)
+    card_data: List[dict] = card_data_fetcher.fetch_card_data(card_names)
 
     # Generate CSV
     generate_csv(card_data, output_path)
