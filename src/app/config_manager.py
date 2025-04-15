@@ -33,9 +33,7 @@ class ConfigManager:
         """
         self.config: AppConfig = {}
 
-        # Construct the absolute path to the config file
-        config_dir = os.path.dirname(os.path.abspath(__file__))  # Get the directory of the current file
-        config_path = os.path.join(config_dir, config_file)
+        config_path = os.path.abspath(config_file) # Use the config_file argument as a path relative to the project root.
 
         try:
             with open(config_path, "r") as f:
