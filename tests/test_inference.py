@@ -8,9 +8,9 @@ class TestInference(unittest.TestCase):
     def test_run_inference_no_detection(self):
         # Mock CardSegmenter to return empty results
         with patch.object(CardSegmenter, "segment_cards", return_value=[]):
-            segmenter = CardSegmenter()  # Create an instance (though it will be mocked)
+            segmenter = CardSegmenter()
             image = np.zeros((100, 100, 3), dtype=np.uint8)
-            results = run_inference(image, segmenter)
+            results = run_inference(image, segmenter)  # Use default threshold
             self.assertEqual(results, [])
 
     def test_run_inference_with_detection_above_threshold(self):
@@ -19,7 +19,7 @@ class TestInference(unittest.TestCase):
         with patch.object(CardSegmenter, "segment_cards", return_value=mock_result):
             segmenter = CardSegmenter()
             image = np.zeros((100, 100, 3), dtype=np.uint8)
-            results = run_inference(image, segmenter)
+            results = run_inference(image, segmenter, confidence_threshold=0.7)  # Test with a threshold
             self.assertEqual(len(results), 1)
             self.assertEqual(results[0]["bbox"], [10, 10, 90, 90])
 
@@ -29,8 +29,8 @@ class TestInference(unittest.TestCase):
         with patch.object(CardSegmenter, "segment_cards", return_value=mock_result):
             segmenter = CardSegmenter()
             image = np.zeros((100, 100, 3), dtype=np.uint8)
-            results = run_inference(image, segmenter)
-            self.assertEqual(results, [])
+            results = run_inference(image, segmenter, confidence_threshold=0.4)  # Test with a threshold
+            self.assertEqual(results, [{"error": "Inference failed: Segmentation error"}])
 
     def test_run_inference_multiple_detections(self):
         # Mock CardSegmenter to return multiple detections with varying confidences

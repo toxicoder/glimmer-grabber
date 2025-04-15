@@ -21,22 +21,22 @@ class TestImageReader(unittest.TestCase):
                 # Create dummy image files
                 image1_path = os.path.join(temp_dir, "image1.jpg")
                 image2_path = os.path.join(temp_dir, "image2.png")
-                # Create a dummy image - a small colored square
+                # Create dummy images - small colored squares
                 dummy_image1 = np.zeros((10, 10, 3), dtype=np.uint8)
-                dummy_image1[:] = (0, 0, 255)  # Blue
+                dummy_image1[:] = (0, 0, 255)  # Blue (RGB)
                 dummy_image2 = np.zeros((10, 10, 3), dtype=np.uint8)
-                dummy_image2[:] = (0, 255, 0)  # Green
-                # Save the dummy images using cv2.imwrite
+                dummy_image2[:] = (0, 255, 0)  # Green (RGB)
+                # Save the dummy images using cv2.imwrite (which saves in BGR)
                 cv2.imwrite(image1_path, dummy_image1)
                 cv2.imwrite(image2_path, dummy_image2)
 
                 images = read_images_from_folder()
 
                 self.assertEqual(len(images), 2)
-                # Check if the images are read correctly, compare to the dummy images
-                self.assertTrue(all(isinstance(img, np.ndarray) for img in images))  # Check if all elements are numpy arrays
-                self.assertTrue(np.array_equal(images[0], dummy_image1))
-                self.assertTrue(np.array_equal(images[1], dummy_image2))
+                # Check if the images are read correctly, compare to the dummy images (converting to RGB for comparison)
+                self.assertTrue(all(isinstance(img, np.ndarray) for img in images))
+                self.assertTrue(np.array_equal(cv2.cvtColor(images[0], cv2.COLOR_BGR2RGB), dummy_image1))
+                self.assertTrue(np.array_equal(cv2.cvtColor(images[1], cv2.COLOR_BGR2RGB), dummy_image2))
 
     def test_read_images_from_folder_empty(self):
         """Test reading from an empty folder.
