@@ -54,3 +54,38 @@ class CardDataFetcher:
             return self.card_data
         else:
             return []
+
+    def validate_card_data(self, card: Dict[str, Any]) -> bool:
+        """Validates a single card data entry."""
+        required_fields = ["name", "type", "set"]
+        return all(field in card for field in required_fields)
+
+    def _load_and_validate_data(self, card_names: List[str] = []) -> bool:
+        """Loads and validates card data from cache or API."""
+        if self._load_from_cache():
+            if not card_names:
+                return True
+            else:
+                self.card_data = [card for card in self.card_data if card["name"] in card_names]
+                return True
+
+        try:
+            response = requests.get(self.api_url)
+            if response.status_code == 200:
+                data = response.json()
+                if isinstance(data, list):
+                    validated_data = [card for card in data if self.validate_card_data(card)]
+                    if card_names:
+                        validated_data = [card for card in validated_data if card["name"] in card_names]
+                    self.card_data = validated_data
+                    self._save_to_cache()
+                    return True
+                else:
+                    print("Error: Invalid data format from API.")
+                    return False
+            else:
+                print(f"Error: API request failed with status code {response.status_code}")
+                return False
+        except requests.RequestException as e:
+            print(f"Error during API request: {e}")
+            return False

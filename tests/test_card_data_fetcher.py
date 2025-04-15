@@ -133,5 +133,20 @@ class TestCardDataFetcher(unittest.TestCase):
         self.assertEqual(len(self.fetcher.card_data), 2)
         self.assertEqual([card["name"] for card in self.fetcher.card_data], card_names)
 
+    @patch('requests.get')
+    def test_load_and_validate_data_api_failure(self, mock_get: MagicMock) -> None:
+        """Test handling of API failure in _load_and_validate_data."""
+        mock_get.return_value.status_code = 500
+        self.assertFalse(self.fetcher._load_and_validate_data([]))
+        self.assertEqual(len(self.fetcher.card_data), 0)
+
+    @patch('requests.get')
+    def test_load_and_validate_data_invalid_data(self, mock_get: MagicMock) -> None:
+        """Test handling of invalid data from API in _load_and_validate_data."""
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {"error": "Invalid format"}
+        self.assertFalse(self.fetcher._load_and_validate_data([]))
+        self.assertEqual(len(self.fetcher.card_data), 0)
+
 if __name__ == "__main__":
     unittest.main()

@@ -26,23 +26,27 @@ class TestConfigManager(unittest.TestCase):
 
     def test_cli_arg_overrides(self) -> None:
         """Test that CLI arguments override config file settings."""
-        # Create a dictionary to simulate CLI arguments
-        cli_args = {
-            "input_dir": "cli_input",
-            "output_dir": "cli_output",
-            "keep_split_card_images": True,
-            "crawl_directories": False,  # Explicitly set to False
-            "save_segmented_images": True,
-            "save_segmented_images_path": "cli_segmented_path",
-        }
+        # Simulate CLI arguments
+        cli_args_list = [
+            "--input_dir", "cli_input",
+            "--output_dir", "cli_output",
+            "--keep_split_card_images",
+            "--crawl_directories",
+            "--save_segmented_images",
+            "--save_segmented_images_path", "cli_segmented_path",
+        ]
 
-        # Initialize ConfigManager with the simulated CLI args
-        config_manager = ConfigManager(cli_args=argparse.Namespace(**cli_args))
+        # Use CLIArgsParser to parse the arguments
+        parser = CLIArgsParser()
+        cli_args = parser.parse_args(cli_args_list)
+
+        # Initialize ConfigManager with the parsed CLI args
+        config_manager = ConfigManager(cli_args=cli_args)
 
         # Assert that the config values reflect the CLI overrides
         self.assertEqual(config_manager.get_input_path(), "cli_input")
         self.assertEqual(config_manager.get_output_path(), "cli_output")
         self.assertEqual(config_manager.get_keep_split_card_images(), True)
-        self.assertEqual(config_manager.get_crawl_directories(), False)
+        self.assertEqual(config_manager.get_crawl_directories(), True)
         self.assertEqual(config_manager.get_save_segmented_images(), True)
         self.assertEqual(config_manager.get_save_segmented_images_path(), "cli_segmented_path")

@@ -73,6 +73,12 @@ class CardSegmenter:
                     bbox: np.ndarray = boxes[i]
                     segmentation: Dict[str, Any] = {"mask": mask, "bbox": bbox}
                     x1, y1, x2, y2 = map(int, bbox)
+
+                    # Check if bounding box coordinates are within image bounds
+                    if x1 < 0 or y1 < 0 or x2 > image.shape[1] or y2 > image.shape[0]:
+                        self.logger.error(f"Bounding box out of bounds: x1={x1}, y1={y1}, x2={x2}, y2={y2}, image shape={image.shape}")
+                        continue  # Skip this segmentation
+
                     segmented_image: np.ndarray = image[y1:y2, x1:x2]
                     segmentation["image"] = segmented_image
                     card_name: str = self.identify_card_name(segmented_image)

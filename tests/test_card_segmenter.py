@@ -40,7 +40,9 @@ class TestCardSegmenter(unittest.TestCase):
         mock_yolo.predict.return_value = []
 
         # Patch the YOLO class in CardSegmenter
-        with patch("src.core.card_segmenter.YOLO", return_value=mock_yolo):
+        with patch("ultralytics.YOLO", return_value=mock_yolo):
+        with patch("ultralytics.YOLO", return_value=mock_yolo):
+        with patch("ultralytics.YOLO", return_value=mock_yolo):
             segmenter = CardSegmenter()
             image = np.zeros((100, 100, 3), dtype=np.uint8)
             results = segmenter.segment_cards(image)
@@ -57,7 +59,9 @@ class TestCardSegmenter(unittest.TestCase):
         mock_yolo = self._create_mock_yolo()
 
         # Patch the YOLO class in CardSegmenter
-        with patch("src.core.card_segmenter.YOLO", return_value=mock_yolo):
+        with patch("ultralytics.YOLO", return_value=mock_yolo):
+        with patch("ultralytics.YOLO", return_value=mock_yolo):
+        with patch("ultralytics.YOLO", return_value=mock_yolo):
             segmenter = CardSegmenter()
             image = np.zeros((100, 100, 3), dtype=np.uint8)
             results = segmenter.segment_cards(image)
@@ -79,7 +83,9 @@ class TestCardSegmenter(unittest.TestCase):
 
 
         # Patch the YOLO class in CardSegmenter
-        with patch("src.core.card_segmenter.YOLO", return_value=mock_yolo):
+        with patch("ultralytics.YOLO", return_value=mock_yolo):
+        with patch("ultralytics.YOLO", return_value=mock_yolo):
+        with patch("ultralytics.YOLO", return_value=mock_yolo):
             segmenter = CardSegmenter()
             image = np.zeros((100, 100, 3), dtype=np.uint8)
             results = segmenter.segment_cards(image)
@@ -106,7 +112,7 @@ class TestCardSegmenter(unittest.TestCase):
             mock_config_manager.get_save_segmented_images.return_value = True
             mock_config_manager.get_save_segmented_images_path.return_value = temp_dir
 
-            with patch("src.core.card_segmenter.YOLO", return_value=mock_yolo), \
+            with patch("ultralytics.YOLO", return_value=mock_yolo), \
                     patch("src.core.card_segmenter.CardSegmenter.identify_card_name", mock_identify_card_name), \
                     patch("src.core.card_segmenter.ConfigManager", return_value=mock_config_manager):
 
@@ -122,7 +128,7 @@ class TestCardSegmenter(unittest.TestCase):
         mock_config_manager.get_save_segmented_images.return_value = False
         with tempfile.TemporaryDirectory() as temp_dir:
             mock_config_manager.get_save_segmented_images_path.return_value = temp_dir
-            with patch("src.core.card_segmenter.YOLO", return_value=mock_yolo), \
+            with patch("ultralytics.YOLO", return_value=mock_yolo), \
                     patch("src.core.card_segmenter.CardSegmenter.identify_card_name", mock_identify_card_name), \
                     patch("src.core.card_segmenter.ConfigManager", return_value=mock_config_manager):
 

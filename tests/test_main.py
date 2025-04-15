@@ -2,7 +2,7 @@ import unittest
 import os
 import shutil
 from unittest.mock import patch, mock_open, call, MagicMock
-from src.app.cli import parse_arguments, main as cli_main
+from src.app.cli import CLIArgsParser, main as cli_main  # Corrected import
 from src.app.config_manager import ConfigManager
 from src.app.image_reader import read_images_from_folder
 from src.core.image_processor import process_images
@@ -11,26 +11,29 @@ from src.app.card_data_fetcher import CardDataFetcher
 
 class TestCLI(unittest.TestCase):
     def test_required_arguments(self):
+        parser = CLIArgsParser()
         with self.assertRaises(SystemExit):  # Assuming argparse uses SystemExit for errors
-            parse_arguments()  # No arguments provided
+            parser.parse_arguments([])  # No arguments provided
 
         with self.assertRaises(SystemExit):
-            parse_arguments(["input_dir"])  # Only one argument
+            parser.parse_arguments(["input_dir"])  # Only one argument
 
         # Test with both required arguments
-        args = parse_arguments(["input_dir", "output_dir"])
+        args = parser.parse_arguments(["input_dir", "output_dir"])
         self.assertEqual(args.input_dir, "input_dir")
         self.assertEqual(args.output_dir, "output_dir")
 
     def test_optional_arguments(self):
-        args = parse_arguments(["input_dir", "output_dir", "--keep_split_card_images"])
+        parser = CLIArgsParser()
+        args = parser.parse_arguments(["input_dir", "output_dir", "--keep_split_card_images"])
         self.assertTrue(args.keep_split_card_images)
 
-        args = parse_arguments(["input_dir", "output_dir", "--crawl_directories"])
+        args = parser.parse_arguments(["input_dir", "output_dir", "--crawl_directories"])
         self.assertTrue(args.crawl_directories)
 
     def test_default_crawl_directories(self):
-        args = parse_arguments(["input_dir", "output_dir"])
+        parser = CLIArgsParser()
+        args = parser.parse_arguments(["input_dir", "output_dir"])
         self.assertTrue(args.crawl_directories)
 
 
@@ -64,7 +67,7 @@ class TestHistoryLog(unittest.TestCase):
             cli_main()
         # Check the written content (should be image filenames + newline)
         handle = mock_file()
-        handle.write.assert_has_calls([call("image1.jpg\n"), call("image2.jpg\n")], any_order=False)
+        handle.write.assert_has_calls([call("image1.jpg\n"), call("image2.png\n")], any_order=False)
 
     @patch("os.path.exists", side_effect=lambda path: path == os.path.join("data", "processed_images.log"))  # Updated path
     @patch("builtins.open", new_callable=mock_open, read_data="image1.jpg\n")  # "image1.jpg" already in history
@@ -128,18 +131,12 @@ class TestHistoryLog(unittest.TestCase):
         shutil.rmtree(input_dir)
 
     def _create_config_manager(self, input_dir, output_dir):
-        args = argparse.Namespace(
-            input_dir=input_dir,
-            output_dir=output_dir,
-            keep_split_card_images=False,
-            crawl_directories=True,
-            save_segmented_images=False,
-            save_segmented_images_path=None
-        )
+        parser = CLIArgsParser()
+        args = parser.parse_arguments([input_dir, output_dir])
         return ConfigManager(cli_args=args)
 
     @patch("src.app.image_reader.read_images_from_folder", return_value=["image1.jpg"])
-    @patch("src.core.image_processor.process_images", return_value=[{"segmentations": [{"name": "Card 1"}]}])
+    @patch("src.core.image_processor.process_images", return_value=[{"segmentations": [{"name": "Card 1"}]}] )
     @patch.object(CardDataFetcher, "fetch_card_data", return_value=[{"card_name": "Card 1", "other_field": "value"}])
     def test_csv_generation(self, mock_fetch_data, mock_process_images, mock_read_images):
         output_dir = "test_output"

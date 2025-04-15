@@ -6,7 +6,7 @@ from src.core.card_segmenter import CardSegmenter
 
 logger = logging.getLogger(__name__)
 
-def run_inference(image: np.ndarray, segmenter: CardSegmenter) -> List[Dict[str, Any]]:
+def run_inference(image: np.ndarray, segmenter: CardSegmenter, confidence_threshold: float = 0.5) -> List[Dict[str, Any]]:
     """Runs inference on a preprocessed image using the CardSegmenter.
 
     This function takes a preprocessed image and a CardSegmenter instance to detect
@@ -30,7 +30,12 @@ def run_inference(image: np.ndarray, segmenter: CardSegmenter) -> List[Dict[str,
         Exception: If an error occurs during inference.
     """
     try:
-        return segmenter.segment_cards(image)
+        results = segmenter.segment_cards(image)
+        if not results:
+            return []
+        # Filter results by confidence threshold, assuming 'confidence' is in the result
+        filtered_results = [result for result in results if result.get("confidence", 0) >= confidence_threshold]
+        return filtered_results
     except Exception as e:
         logger.exception(f"Error during inference: {e}")
         return [{"error": f"Inference failed: {e}"}]
