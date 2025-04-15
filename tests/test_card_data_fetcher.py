@@ -24,23 +24,23 @@ class TestCardDataFetcher(unittest.TestCase):
         """Test successful fetching of card data from the API."""
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = self.mock_card_data
-        self.assertTrue(self.fetcher.fetch_card_data())
-        self.assertEqual(len(self.fetcher.get_card_data()), 1)
+        self.assertEqual(self.fetcher.fetch_card_data([]), self.mock_card_data)
+        self.assertEqual(len(self.fetcher.card_data), 1)
 
     @patch('requests.get')
     def test_fetch_card_data_failure(self, mock_get: MagicMock) -> None:
         """Test handling of API request failure."""
         mock_get.return_value.status_code = 500
-        self.assertFalse(self.fetcher.fetch_card_data())
-        self.assertEqual(len(self.fetcher.get_card_data()), 0)
+        self.assertEqual(self.fetcher.fetch_card_data([]), [])
+        self.assertEqual(len(self.fetcher.card_data), 0)
 
     @patch('requests.get')
     def test_fetch_card_data_invalid_response(self, mock_get: MagicMock) -> None:
         """Test handling of invalid response format from the API."""
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = {"error": "Invalid format"}
-        self.assertFalse(self.fetcher.fetch_card_data())
-        self.assertEqual(len(self.fetcher.get_card_data()), 0)
+        self.assertEqual(self.fetcher.fetch_card_data([]), [])
+        self.assertEqual(len(self.fetcher.card_data), 0)
 
     def test_validate_card_data_success(self) -> None:
         """Test successful validation of card data."""
@@ -52,31 +52,6 @@ class TestCardDataFetcher(unittest.TestCase):
         card: Dict[str, str] = {"name": "Card 1", "set": "Set 1"}
         self.assertFalse(self.fetcher.validate_card_data(card))
 
-    @patch('requests.get')
-    def test_load_and_validate_data(self, mock_get: MagicMock) -> None:
-        """Test loading and validating data, including handling of invalid entries."""
-        mock_get.return_value.status_code = 200
-        mock_get.return_value.json.return_value = [
-            {"name": "Card 1", "type": "Action", "set": "Set 1"},
-            {"name": "Card 2", "set": "Set 2"}  # Missing 'type'
-        ]
-        self.assertTrue(self.fetcher.load_and_validate_data())
-        self.assertEqual(len(self.fetcher.get_card_data()), 1)  # Only one valid card
-
-    @patch('requests.get')
-    def test_load_and_validate_data_with_names(self, mock_get: MagicMock) -> None:
-        """Test loading and validating data with a list of card names."""
-        mock_get.return_value.status_code = 200
-        mock_get.return_value.json.return_value = [
-            {"name": "Card 1", "type": "Action", "set": "Set 1"},
-            {"name": "Card 2", "type": "Character", "set": "Set 2"},
-            {"name": "Card 3", "type": "Item", "set": "Set 1"},
-        ]
-        card_names: List[str] = ["Card 1", "Card 3"]
-        self.assertTrue(self.fetcher.load_and_validate_data(card_names))
-        self.assertEqual(len(self.fetcher.get_card_data()), 2)
-        self.assertEqual([card["name"] for card in self.fetcher.get_card_data()], card_names)
-
     @patch('os.path.exists')
     @patch('time.time')
     @patch('os.path.getmtime')
@@ -87,7 +62,7 @@ class TestCardDataFetcher(unittest.TestCase):
         mock_time.return_value = 1000  # Simulate current time
         mock_getmtime.return_value = 900  # Simulate cache modified time (within validity)
         self.assertTrue(self.fetcher._load_from_cache())
-        self.assertEqual(self.fetcher.get_card_data(), [{"name": "Cached Card", "type": "Character", "set": "Cached Set"}])
+        self.assertEqual(self.fetcher.card_data, [{"name": "Cached Card", "type": "Character", "set": "Cached Set"}])
 
     @patch('requests.get')
     @patch('builtins.open', new_callable=mock_open)
@@ -95,7 +70,7 @@ class TestCardDataFetcher(unittest.TestCase):
         """Test saving fetched card data to the cache file."""
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = self.mock_card_data
-        self.fetcher.fetch_card_data()
+        self.fetcher.fetch_card_data([])
         mock_file.assert_called_once_with(self.cache_file, "w")
         mock_file.return_value.write.assert_called_once_with(json.dumps(self.mock_card_data))
 
@@ -132,6 +107,31 @@ class TestCardDataFetcher(unittest.TestCase):
         ]
         actual_data: List[Dict[str, Any]] = self.fetcher.fetch_card_data([])
         self.assertEqual(actual_data, expected_data)
+
+    @patch('requests.get')
+    def test_load_and_validate_data(self, mock_get: MagicMock) -> None:
+        """Test loading and validating data, including handling of invalid entries."""
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = [
+            {"name": "Card 1", "type": "Action", "set": "Set 1"},
+            {"name": "Card 2", "set": "Set 2"}  # Missing 'type'
+        ]
+        self.assertTrue(self.fetcher._load_and_validate_data([]))
+        self.assertEqual(len(self.fetcher.card_data), 1)
+
+    @patch('requests.get')
+    def test_load_and_validate_data_with_names(self, mock_get: MagicMock) -> None:
+        """Test loading and validating data with a list of card names."""
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = [
+            {"name": "Card 1", "type": "Action", "set": "Set 1"},
+            {"name": "Card 2", "type": "Character", "set": "Set 2"},
+            {"name": "Card 3", "type": "Item", "set": "Set 1"},
+        ]
+        card_names: List[str] = ["Card 1", "Card 3"]
+        self.assertTrue(self.fetcher._load_and_validate_data(card_names))
+        self.assertEqual(len(self.fetcher.card_data), 2)
+        self.assertEqual([card["name"] for card in self.fetcher.card_data], card_names)
 
 if __name__ == "__main__":
     unittest.main()

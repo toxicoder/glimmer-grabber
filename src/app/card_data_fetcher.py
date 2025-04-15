@@ -44,13 +44,13 @@ class CardDataFetcher:
 
     def fetch_card_data(self, card_names: List[str] = []) -> List[Dict[str, Any]]:
         """Fetches card data from the API or loads it from the cache if available and valid.
-        This method uses the load_and_validate_data method to ensure only valid card data is returned.
+        This method uses the _load_and_validate_data method to ensure only valid card data is returned.
         Args:
             card_names: A list of card names to filter the results.  If empty, all cards are returned.
         Returns:
             A list of validated card data dictionaries, filtered by card_names if provided.
         """
-        if self.load_and_validate_data(card_names):
+        if self._load_and_validate_data(card_names):
             return self.card_data
         else:
             return []

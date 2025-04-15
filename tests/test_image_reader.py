@@ -1,65 +1,70 @@
 import unittest
 import os
 import numpy as np
-from unittest.mock import patch, mock_open
+import cv2
+import tempfile
 from src.app.image_reader import read_images_from_folder, iterate_images
+from unittest.mock import patch
+
+from src.app.config_manager import ConfigManager
 
 class TestImageReader(unittest.TestCase):
     """Tests for the image reading utility."""
-    @patch('glob.glob')
-    @patch('cv2.imread')
-    def test_read_images_from_folder_success(self, mock_imread, mock_glob):
+    def test_read_images_from_folder_success(self):
         """Test successful reading of images from a folder.
 
-        This test checks if the function correctly reads image files from a specified
-        folder. It mocks the `glob.glob` function to simulate finding image files and
-        `cv2.imread` to simulate successful image reading. It then verifies that the
-        function returns a list of images with the expected content.
+        This test checks if the function correctly reads image files.
+        It uses a temporary directory and verifies the function's output.
         """
-        # Simulate finding two image files
-        mock_glob.return_value = ["image1.jpg", "image2.png"]
-        # Simulate reading images successfully
-        mock_imread.side_effect = [np.zeros((100, 100, 3), dtype=np.uint8), np.ones((100, 100, 3), dtype=np.uint8)]
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with patch.object(ConfigManager, "get_input_path", return_value=temp_dir):
+                # Create dummy image files
+                image1_path = os.path.join(temp_dir, "image1.jpg")
+                image2_path = os.path.join(temp_dir, "image2.png")
+                # Create a dummy image - a small colored square
+                dummy_image1 = np.zeros((10, 10, 3), dtype=np.uint8)
+                dummy_image1[:] = (0, 0, 255)  # Blue
+                dummy_image2 = np.zeros((10, 10, 3), dtype=np.uint8)
+                dummy_image2[:] = (0, 255, 0)  # Green
+                # Save the dummy images using cv2.imwrite
+                cv2.imwrite(image1_path, dummy_image1)
+                cv2.imwrite(image2_path, dummy_image2)
 
-        images = read_images_from_folder()  # Call without arguments
+                images = read_images_from_folder()
 
-        self.assertEqual(len(images), 2)
-        self.assertTrue(np.array_equal(images[0], np.zeros((100, 100, 3), dtype=np.uint8)))
-        self.assertTrue(np.array_equal(images[1], np.ones((100, 100, 3), dtype=np.uint8)))
+                self.assertEqual(len(images), 2)
+                # Check if the images are read correctly, compare to the dummy images
+                self.assertTrue(all(isinstance(img, np.ndarray) for img in images))  # Check if all elements are numpy arrays
+                self.assertTrue(np.array_equal(images[0], dummy_image1))
+                self.assertTrue(np.array_equal(images[1], dummy_image2))
 
-    @patch('glob.glob')
-    def test_read_images_from_folder_empty(self, mock_glob):
+    def test_read_images_from_folder_empty(self):
         """Test reading from an empty folder.
 
-        This test checks the behavior of the function when no image files are found in
-        the specified folder. It mocks the `glob.glob` function to simulate an empty
-        folder and verifies that the function returns an empty list.
+        This test checks the behavior of the function when no image files are found.
+        It uses a temporary directory and verifies that the function returns an empty list.
         """
-        # Simulate no image files found
-        mock_glob.return_value = []
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with patch.object(ConfigManager, "get_input_path", return_value=temp_dir):
+                images = read_images_from_folder()
+                self.assertEqual(len(images), 0)
 
-        images = read_images_from_folder()  # Call without arguments
-
-        self.assertEqual(len(images), 0)
-
-    @patch('glob.glob')
-    @patch('cv2.imread')
-    def test_read_images_from_folder_read_error(self, mock_imread, mock_glob):
+    def test_read_images_from_folder_read_error(self):
         """Test handling of image reading errors.
 
         This test checks the behavior of the function when an error occurs while
-        reading an image file. It mocks `glob.glob` to simulate finding an image file
-        and `cv2.imread` to simulate a reading error (returning None). It then
-        verifies that the function returns an empty list.
+        reading an image file. It creates a temporary directory and adds a file that
+        is not a valid image. It then verifies that the function returns an empty list.
         """
-        # Simulate finding one image file
-        mock_glob.return_value = ["image1.jpg"]
-        # Simulate error reading the image
-        mock_imread.return_value = None
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with patch.object(ConfigManager, "get_input_path", return_value=temp_dir):
+                # Create a file that is not a valid image
+                invalid_image_path = os.path.join(temp_dir, "invalid_image.txt")
+                with open(invalid_image_path, "w") as f:
+                    f.write("This is not an image.")
 
-        images = read_images_from_folder()  # Call without arguments
-
-        self.assertEqual(len(images), 0)
+                images = read_images_from_folder()
+                self.assertEqual(len(images), 0)
 
     def test_iterate_images(self):
         """Test iterating through a list of images.
@@ -78,6 +83,3 @@ class TestImageReader(unittest.TestCase):
         self.assertTrue(np.array_equal(next(image_gen), images[1]))
         with self.assertRaises(StopIteration):
             next(image_gen)
-
-if __name__ == '__main__':
-    unittest.main()

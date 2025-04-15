@@ -60,22 +60,8 @@ class ConfigManager:
         Args:
             cli_args: An argparse.Namespace object containing command-line arguments.
         """
-        for key in vars(cli_args):
-            value = getattr(cli_args, key)
+        for key, value in vars(cli_args).items():
             if value is not None:
-                self.config[key] = value
-
-    def update_with_cli_args(self, cli_config: AppConfig) -> None:  # Modified this to use cli_config
-        """Updates the configuration with values from command-line arguments.
-
-        Command-line arguments take precedence over settings loaded from the configuration file.
-
-        Args:
-            cli_config: A dictionary of command-line arguments mapped to configuration keys.  # Modified this docstring
-        """
-        cli_config = vars(cli_args)  # Convert Namespace to dictionary
-        for key, value in cli_config.items():
-            if value is not None:  # Only update if the value is provided
                 self.config[key] = value
 
     def get_input_path(self) -> Optional[str]:
