@@ -38,7 +38,7 @@ def process_images(image_files: List[str], output_path: str, save_segmented_imag
     for image_path in image_files:
         print(f"Processing image: {image_path}")
         try:
-            image: Optional[cv2.Mat] = cv2.imread(image_path)
+            image: Optional[cv2.Mat] = cv2.imread(os.path.abspath(image_path))
             if image is None:
                 if not os.path.exists(image_path):
                     print(f"Error: Could not read image at {image_path}: File not found.")
