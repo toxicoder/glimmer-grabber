@@ -125,5 +125,30 @@ class TestHistoryLog(unittest.TestCase):
         # Clean up the dummy input directory
         shutil.rmtree(input_dir)
 
+    @patch("image_reader.read_images_from_folder", return_value=["image1.jpg"])
+    @patch("src.core.image_processor.process_images", return_value=[{"segmentations": [{"name": "Card 1"}]}])
+    @patch("src.app.card_data_fetcher.CardDataFetcher.fetch_card_data", return_value=[{"card_name": "Card 1", "other_field": "value"}])
+    def test_csv_generation(self, mock_fetch_data, mock_process_images, mock_read_images):
+        output_dir = "test_output"
+        os.makedirs(output_dir, exist_ok=True)
+        config_manager = ConfigManager(cli_args={"input_dir": "dummy_input", "output_dir": output_dir})
+        with patch("main.config_manager", config_manager):
+            main.main()
+
+        # Check if CSV file is created
+        csv_files = [f for f in os.listdir(output_dir) if f.startswith("lorcana_collection_") and f.endswith(".csv")]
+        self.assertEqual(len(csv_files), 1)
+        csv_file_path = os.path.join(output_dir, csv_files[0])
+
+        # Read and verify CSV content
+        with open(csv_file_path, "r", newline="", encoding="utf-8") as csvfile:
+            reader = csv.DictReader(csvfile)
+            rows = list(reader)
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(rows[0]["card_name"], "Card 1")
+            self.assertEqual(rows[0]["other_field"], "value")
+
+        shutil.rmtree(output_dir)
+
 if __name__ == "__main__":
     unittest.main()
