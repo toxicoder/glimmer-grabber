@@ -3,7 +3,7 @@ name = "glimmer-grabber"
 version = "0.1.0"
 description = "Tooling for digitizing Lorcana Trading Cards."
 authors = [{ name = "Your Name", email = "your.email@example.com" }]  # Replace with actual author info if available
-license = {text = "MIT"}
+license = "MIT"
 requires-python = ">=3.7"
 dependencies = [
     "numpy",
@@ -14,12 +14,12 @@ dependencies = [
 ]
 
 [project.scripts]
-glimmer-grabber = "glimmer_grabber.cli:main"  # CLI Entry Point
+glimmer-grabber = "app.cli:main"  # CLI Entry Point
 
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["glimmer_grabber"]
+packages = ["app", "core", "utils"]
 package-dir = {"" = "src"}
