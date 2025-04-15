@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from typing import List, Dict, Any, Optional
-from .config_manager import ConfigManager
+from src.app.config_manager import ConfigManager
 import pytesseract
 import os
 import re

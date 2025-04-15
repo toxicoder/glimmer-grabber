@@ -21,7 +21,7 @@ class TestImageReader(unittest.TestCase):
         # Simulate reading images successfully
         mock_imread.side_effect = [np.zeros((100, 100, 3), dtype=np.uint8), np.ones((100, 100, 3), dtype=np.uint8)]
 
-        images = read_images_from_folder("test_folder")
+        images = read_images_from_folder()  # Call without arguments
 
         self.assertEqual(len(images), 2)
         self.assertTrue(np.array_equal(images[0], np.zeros((100, 100, 3), dtype=np.uint8)))
@@ -38,7 +38,7 @@ class TestImageReader(unittest.TestCase):
         # Simulate no image files found
         mock_glob.return_value = []
 
-        images = read_images_from_folder("test_folder")
+        images = read_images_from_folder()  # Call without arguments
 
         self.assertEqual(len(images), 0)
 
@@ -57,7 +57,7 @@ class TestImageReader(unittest.TestCase):
         # Simulate error reading the image
         mock_imread.return_value = None
 
-        images = read_images_from_folder("test_folder")
+        images = read_images_from_folder()  # Call without arguments
 
         self.assertEqual(len(images), 0)
 
