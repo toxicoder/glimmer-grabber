@@ -2,7 +2,7 @@ import unittest
 import os
 import numpy as np
 from unittest.mock import patch, mock_open
-from image_reader import read_images_from_folder, iterate_images
+from src.app.image_reader import read_images_from_folder, iterate_images
 
 class TestImageReader(unittest.TestCase):
     """Tests for the image reading utility."""
