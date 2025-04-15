@@ -24,8 +24,9 @@ Follow these steps to set up Glimmer Grabber on your system:
 2. **Create a Virtual Environment**:
    ```bash
    python3 -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   source .venv/bin/activate  
    ```
+   _On Windows: `.venv\Scripts\activate`_
 
 3. **Install Dependencies**:
    ```bash
