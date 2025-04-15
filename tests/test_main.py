@@ -2,8 +2,8 @@ import unittest
 import os
 import shutil
 from unittest.mock import patch, mock_open, call
-from cli import parse_arguments
-from config_manager import ConfigManager
+from src.app.cli import parse_arguments
+from src.app.config_manager import ConfigManager
 import main  # Import the main module to access its logic
 
 class TestCLI(unittest.TestCase):

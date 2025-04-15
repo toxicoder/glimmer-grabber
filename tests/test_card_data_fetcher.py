@@ -4,7 +4,7 @@ import json
 import os
 import time
 from typing import List, Dict, Any
-from src.glimmer_grabber.card_data_fetcher import CardDataFetcher
+from src.app.card_data_fetcher import CardDataFetcher
 
 class TestCardDataFetcher(unittest.TestCase):
     """Tests for the CardDataFetcher class."""

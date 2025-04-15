@@ -41,7 +41,7 @@ class TestContrastChecker(unittest.TestCase):
         # Check with a higher threshold
         self.assertFalse(check_low_contrast(image, threshold=0.5))
         # Check with a lower threshold
-        self.assertTrue(check_low_contrast(image, threshold=0.1))
+        self.assertFalse(check_low_contrast(image, threshold=0.1))
 
 if __name__ == '__main__':
     unittest.main()

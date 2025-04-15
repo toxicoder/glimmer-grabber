@@ -1,6 +1,7 @@
 import numpy as np
 from typing import List, Dict, Any
 import logging
+from src.core.card_segmenter import CardSegmenter
 """Runs inference on preprocessed images."""
 
 logger = logging.getLogger(__name__)
