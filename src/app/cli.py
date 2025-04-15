@@ -20,23 +20,20 @@ def load_processed_images() -> List[str]:
 processed_images: List[str] = load_processed_images()
 
 
+import datetime
+
 def generate_csv(card_data: List[dict], output_path: str) -> None:
-    """Generates a CSV file from the fetched card data.
+    """Generates a CSV file from the fetched card data with a timestamp in the filename.
 
     Args:
         card_data: A list of dictionaries, where each dictionary represents a card.
         output_path: The path to the output directory.
     """
-    n = 1
-    while True:
-        csv_file_path = os.path.join(output_path, f"lorcana_collection_{n}.csv")
-        if not os.path.exists(csv_file_path):
-            break
-        n += 1
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    csv_file_path = os.path.join(output_path, f"lorcana_collection_{timestamp}.csv")
 
-    # Generates a unique filename for the CSV output to prevent overwriting existing files.
-    # The filename follows the format "lorcana_collection_{n}.csv", where 'n' is an incrementing number.
-    # The function checks for existing files with this pattern and increments 'n' until a unique filename is found.
+    # Generates a unique filename for the CSV output with a timestamp to prevent overwriting.
+    # The filename follows the format "lorcana_collection_YYYYMMDD_HHMMSS.csv".
     if not os.path.exists(output_path):
         os.makedirs(output_path)
     with open(csv_file_path, mode="w", newline="", encoding="utf-8") as csvfile:
@@ -89,7 +86,6 @@ def main() -> None:
     card_names: List[str] = []
     for data in processed_data:
         if data["segmentations"]:  # Check if segmentation data is available
-            # Assuming segmentations is a list of dictionaries, each with a "name" key
             for segmentation in data["segmentations"]:
                 if "name" in segmentation:
                     card_names.append(segmentation["name"])
@@ -97,8 +93,13 @@ def main() -> None:
     # Create an instance of CardDataFetcher
     card_data_fetcher: CardDataFetcher = CardDataFetcher()
 
-    # Fetch card data using the processed data
+    # Fetch card data using the processed card names
     card_data: List[dict] = card_data_fetcher.fetch_card_data(card_names)
+    
+    # Add the card name to the card data
+    for i, card in enumerate(card_data):
+        if i < len(card_names):
+            card["card_name"] = card_names[i]
 
     # Generate CSV
     generate_csv(card_data, output_path)
