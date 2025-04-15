@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.scripts]
-glimmer-grabber = "app.cli:main"  # CLI Entry Point
+glimmer-grabber = "src.app.cli:main"  # CLI Entry Point
 
 [build-system]
 requires = ["setuptools"]
