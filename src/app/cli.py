@@ -4,10 +4,10 @@ import argparse
 import os
 import csv  # Import the csv module
 from typing import List
-from .config_manager import ConfigManager
-from .image_reader import read_images_from_folder
-from ..core.image_processor import process_images
-from .card_data_fetcher import CardDataFetcher  # Import the CardDataFetcher class
+from src.app.config_manager import ConfigManager
+from src.app.image_reader import read_images_from_folder
+from src.core.image_processor import process_images
+from src.app.card_data_fetcher import CardDataFetcher  # Import the CardDataFetcher class
 """Command-line interface for the card processing application."""
 
 def load_processed_images() -> List[str]:

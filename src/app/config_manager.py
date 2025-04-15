@@ -1,9 +1,8 @@
 import json
-import json
-from typing import Optional, Any, Dict, List
+from typing import Optional, Any, Dict
 import argparse
+import os
 from src.app.cli_args_parser import CLIArgsParser
-"""Manages application configuration settings."""
 
 AppConfig = Dict[str, Any]
 
@@ -17,6 +16,7 @@ class ConfigManager:
     Attributes:
         config: A dictionary holding the configuration settings.
     """
+
     def __init__(self, config_file: str = "config.json", cli_args: Optional[argparse.Namespace] = None) -> None:
         """Initializes the ConfigManager.
 
@@ -33,17 +33,37 @@ class ConfigManager:
         """
         self.config: AppConfig = {}
 
+        # Construct the absolute path to the config file
+        config_dir = os.path.dirname(os.path.abspath(__file__))  # Get the directory of the current file
+        config_path = os.path.join(config_dir, config_file)
+
         try:
-            with open(config_file, "r") as f:
-                self.config = json.load(f)
+            with open(config_path, "r") as f:
+                file_config = json.load(f)
+                if isinstance(file_config, dict):
+                    self.config.update(file_config)
+                else:
+                    print(f"Invalid configuration format in {config_path}. Expected a JSON object.")
         except FileNotFoundError:
-            print(f"Configuration file not found: {config_file}. Using default settings.")
+            print(f"Configuration file not found: {config_path}. Using default settings.")
         except json.JSONDecodeError as e:
             raise json.JSONDecodeError(f"Invalid JSON format in configuration file: {e}", e.doc, e.pos)
 
-        cli_args_parser = CLIArgsParser()  # Instantiate the CLIArgsParser
-        cli_config = cli_args_parser.parse_arguments()  # Parse and map CLI arguments
-        self.update_with_cli_args(cli_config)  # Update configuration with CLI arguments
+        if cli_args:
+            self.update_with_cli_args(cli_args)
+
+    def update_with_cli_args(self, cli_args: argparse.Namespace) -> None:
+        """Updates the configuration with values from command-line arguments.
+
+        Command-line arguments take precedence over settings loaded from the configuration file.
+
+        Args:
+            cli_args: An argparse.Namespace object containing command-line arguments.
+        """
+        cli_config = vars(cli_args)  # Convert Namespace to dictionary
+        for key, value in cli_config.items():
+            if value is not None:  # Only update if the value is provided
+                self.config[key] = value
 
     def update_with_cli_args(self, cli_config: AppConfig) -> None:  # Modified this to use cli_config
         """Updates the configuration with values from command-line arguments.
