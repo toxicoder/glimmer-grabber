@@ -16,7 +16,7 @@ def check_low_contrast(image: np.ndarray, threshold: float = 0.35) -> bool:
             full intensity range.
 
     Returns:
-        True if the image has low contrast, False otherwise.
+        True if the image has sufficient contrast, False if it has low contrast.
     """
     gray_image: np.ndarray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    return bool(is_low_contrast(gray_image, fraction_threshold=threshold))
+    return not bool(is_low_contrast(gray_image, fraction_threshold=threshold))
