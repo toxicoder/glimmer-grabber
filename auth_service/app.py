@@ -8,7 +8,7 @@ from datetime import timedelta
 
 from shared.database.database import get_db, engine
 from shared.models.models import User, Base
-from shared.schemas.schemas import UserCreate, User as UserSchema, Token
+from shared.schemas.schemas import UserCreate, User as UserSchema, Token, UserLogin
 from . import utils, security
 from .config import settings
 
@@ -31,9 +31,25 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     db.refresh(db_user)
     return db_user
 
+@app.post("/api/v1/auth/login", response_model=Token)
+def login(user_credentials: UserLogin, db: Session = Depends(get_db)):
+    user = security.authenticate_user_by_email(db, email=user_credentials.email, password=user_credentials.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = security.create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
 @app.post("/token", response_model=Token)
 def login_for_access_token(form_data: security.OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = security.authenticate_user(db, form_data.username, form_data.password)
+    user = security.authenticate_user_by_username(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
