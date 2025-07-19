@@ -24,7 +24,15 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
-def authenticate_user(db: Session, username: str, password: str):
+def authenticate_user_by_email(db: Session, email: str, password: str):
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        return False
+    if not utils.verify_password(password, user.hashed_password):
+        return False
+    return user
+
+def authenticate_user_by_username(db: Session, username: str, password: str):
     user = db.query(User).filter(User.username == username).first()
     if not user:
         return False
