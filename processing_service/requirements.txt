@@ -1,0 +1,4 @@
+# Placeholder requirements.txt
+redis
+pika
+consul-python

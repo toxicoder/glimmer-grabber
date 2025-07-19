@@ -1,0 +1,5 @@
+# Placeholder requirements.txt
+fastapi
+uvicorn
+psycopg2-binary
+consul-python
