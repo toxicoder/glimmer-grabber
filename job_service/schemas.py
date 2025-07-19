@@ -3,17 +3,14 @@ from typing import List, Optional
 from datetime import datetime
 
 class CardBase(BaseModel):
-    card_number: str
-    expiry_month: int
-    expiry_year: int
-    cvv: str
+    content: str
 
 class CardCreate(CardBase):
     pass
 
 class Card(CardBase):
     id: int
-    processing_job_id: int
+    job_id: int
 
     class Config:
         orm_mode = True
