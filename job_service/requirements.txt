@@ -1,8 +1,4 @@
 # Placeholder requirements.txt
 fastapi
 uvicorn
-psycopg2-binary
-pika
-python-consul
-SQLAlchemy
-alembic
+-e ../shared
