@@ -84,12 +84,17 @@ def read_jobs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     jobs = db.query(ProcessingJob).offset(skip).limit(limit).all()
     return jobs
 
-@app.get("/jobs/{job_id}", response_model=schemas.ProcessingJob)
-def read_job(job_id: int, db: Session = Depends(get_db)):
-    db_job = db.query(ProcessingJob).filter(ProcessingJob.id == job_id).first()
+@app.get("/api/v1/jobs/{job_id}", response_model=schemas.JobStatusResponse)
+def read_job(job_id: int, db: Session = Depends(get_db), user_id: int = Depends(get_user_id_from_token)):
+    db_job = db.query(ProcessingJob).filter(ProcessingJob.id == job_id, ProcessingJob.user_id == user_id).first()
     if db_job is None:
         raise HTTPException(status_code=404, detail="Job not found")
-    return db_job
+
+    results = None
+    if db_job.status == "COMPLETED":
+        results = db_job.cards
+
+    return {"status": db_job.status, "results": results}
 
 @app.put("/jobs/{job_id}", response_model=schemas.ProcessingJob)
 def update_job(job_id: int, job: schemas.ProcessingJobCreate, db: Session = Depends(get_db)):
