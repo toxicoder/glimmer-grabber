@@ -21,6 +21,11 @@ const services = [
     route: '/api/v1/jobs',
     target: 'http://job_service:8000',
     middleware: [authMiddleware]
+  },
+  {
+    route: '/api/v1/collections',
+    target: 'http://job_service:8000',
+    middleware: [authMiddleware]
   }
 ];
 

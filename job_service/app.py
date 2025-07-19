@@ -115,3 +115,16 @@ def delete_job(job_id: int, db: Session = Depends(get_db)):
     db.delete(db_job)
     db.commit()
     return db_job
+
+@app.get("/api/v1/collections", response_model=List[schemas.Card])
+def get_collection(db: Session = Depends(get_db), user_id: int = Depends(get_user_id_from_token)):
+    """
+    Retrieves all cards for the authenticated user.
+    """
+    cards = (
+        db.query(Card)
+        .join(ProcessingJob)
+        .filter(ProcessingJob.user_id == user_id)
+        .all()
+    )
+    return cards
