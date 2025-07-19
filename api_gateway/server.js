@@ -12,9 +12,6 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-const { getFile } = require('./googleDrive');
-const { getJamboard } = require('./jamboard');
-
 const services = [
   {
     route: '/auth',
@@ -37,24 +34,6 @@ services.forEach(({ route, target, middleware }) => {
     app.use(route, ...middleware, createProxyMiddleware({ target, changeOrigin: true }));
   } else {
     app.use(route, createProxyMiddleware({ target, changeOrigin: true }));
-  }
-});
-
-app.get('/api/v1/google-drive/:fileId', authMiddleware, async (req, res) => {
-  try {
-    const file = await getFile(req.params.fileId);
-    res.json(file);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
-
-app.get('/api/v1/jamboard/:fileId', authMiddleware, async (req, res) => {
-  try {
-    const file = await getJamboard(req.params.fileId);
-    res.json(file);
-  } catch (error) {
-    res.status(500).send(error.message);
   }
 });
 
