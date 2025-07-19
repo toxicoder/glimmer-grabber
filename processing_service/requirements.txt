@@ -1,4 +1,4 @@
 # Placeholder requirements.txt
 redis
 pika
-consul-python
+python-consul
