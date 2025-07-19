@@ -1,3 +1,7 @@
-# Placeholder requirements.txt
 fastapi
 uvicorn
+boto3
+pika
+psycopg2-binary
+sqlalchemy
+alembic

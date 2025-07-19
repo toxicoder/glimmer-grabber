@@ -14,7 +14,7 @@ from .config import settings
 
 app = FastAPI()
 
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine)
 
 @app.post("/api/v1/auth/register", response_model=UserSchema)
 def register_user(user: UserCreate, db: Session = Depends(get_db)):

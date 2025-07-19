@@ -28,7 +28,16 @@ class ProcessingJobCreate(ProcessingJobBase):
 
 class ProcessingJob(ProcessingJobBase):
     id: int
+    s3_object_key: str
     cards: List[Card] = []
 
     class Config:
         orm_mode = True
+
+class JobCreationRequest(BaseModel):
+    filename: str
+    contentType: str
+
+class JobCreationResponse(BaseModel):
+    jobId: int
+    uploadUrl: str

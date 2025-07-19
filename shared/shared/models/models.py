@@ -18,6 +18,7 @@ class ProcessingJob(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, index=True)
     status = Column(String, index=True)
+    s3_object_key = Column(String, index=True)
 
     cards = relationship("Card", back_populates="job")
 
