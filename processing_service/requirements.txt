@@ -1,4 +1,6 @@
-# Placeholder requirements.txt
 redis
 pika
 python-consul
+numpy
+Pillow
+requests
