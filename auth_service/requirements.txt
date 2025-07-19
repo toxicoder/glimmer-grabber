@@ -1,4 +1,6 @@
 # Placeholder requirements.txt
 fastapi
 uvicorn
--e ../shared
+passlib[bcrypt]
+python-jose[cryptography]
+pydantic-settings
