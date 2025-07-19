@@ -4,3 +4,4 @@ python-consul
 numpy
 Pillow
 requests
+celery
