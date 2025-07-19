@@ -3,4 +3,6 @@ fastapi
 uvicorn
 psycopg2-binary
 pika
-consul-python
+python-consul
+SQLAlchemy
+alembic

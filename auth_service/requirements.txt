@@ -2,4 +2,6 @@
 fastapi
 uvicorn
 psycopg2-binary
-consul-python
+python-consul
+SQLAlchemy
+alembic
