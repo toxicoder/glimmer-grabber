@@ -16,13 +16,16 @@ app = FastAPI()
 
 Base.metadata.create_all(bind=engine)
 
-@app.post("/users/", response_model=UserSchema)
-def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = db.query(User).filter(User.username == user.username).first()
-    if db_user:
+@app.post("/api/v1/auth/register", response_model=UserSchema)
+def register_user(user: UserCreate, db: Session = Depends(get_db)):
+    db_user_by_email = db.query(User).filter(User.email == user.email).first()
+    if db_user_by_email:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    db_user_by_username = db.query(User).filter(User.username == user.username).first()
+    if db_user_by_username:
         raise HTTPException(status_code=400, detail="Username already registered")
     hashed_password = utils.hash_password(user.password)
-    db_user = User(username=user.username, hashed_password=hashed_password)
+    db_user = User(username=user.username, email=user.email, hashed_password=hashed_password)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
