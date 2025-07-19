@@ -2,75 +2,77 @@ version: '3.8'
 
 services:
   # Service Discovery & Configuration
-  consul:
-    image: consul:1.10
-    ports:
-      - "8500:8500"
-    volumes:
-      - ./consul/config:/consul/config
-    command: "agent -server -bootstrap-expect 1 -ui -client 0.0.0.0"
+  # consul:
+  #   image: consul:1.10
+  #   ports:
+  #     - "8500:8500"
+  #   volumes:
+  #     - ./consul/config:/consul/config
+  #   command: "agent -server -bootstrap-expect 1 -ui -client 0.0.0.0"
 
   # API Gateway
-  api_gateway:
-    build:
-      context: ./api_gateway
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    depends_on:
-      - consul
-      - auth_service
-      - job_service
-      - processing_service
+  # api_gateway:
+  #   build:
+  #     context: ./api_gateway
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - consul
+  #     - auth_service
+  #     - job_service
+  #     - processing_service
 
   # Authentication Service
-  auth_service:
-    build:
-      context: ./auth_service
-      dockerfile: Dockerfile
-    depends_on:
-      - consul
-      - postgres_auth
+  # auth_service:
+  #   build:
+  #     context: ./auth_service
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     - consul
+  #     - postgres_auth
 
   # Job Service
   job_service:
     build:
       context: ./job_service
       dockerfile: Dockerfile
+    ports:
+      - "8002:8002"
     depends_on:
-      - consul
+      # - consul
       - postgres_jobs
       - rabbitmq
 
   # Processing Service
-  processing_service:
-    build:
-      context: ./processing_service
-      dockerfile: Dockerfile
-    depends_on:
-      - consul
-      - redis
-      - rabbitmq
+  # processing_service:
+  #   build:
+  #     context: ./processing_service
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     - consul
+  #     - redis
+  #     - rabbitmq
 
   # Frontend
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    depends_on:
-      - api_gateway
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - api_gateway
 
   # Databases & Caching
-  postgres_auth:
-    image: postgres:13
-    environment:
-      POSTGRES_USER: auth_user
-      POSTGRES_PASSWORD: auth_password
-      POSTGRES_DB: auth_db
-    ports:
-      - "5432:5432"
+  # postgres_auth:
+  #   image: postgres:13
+  #   environment:
+  #     POSTGRES_USER: auth_user
+  #     POSTGRES_PASSWORD: auth_password
+  #     POSTGRES_DB: auth_db
+  #   ports:
+  #     - "5432:5432"
 
   postgres_jobs:
     image: postgres:13
@@ -81,10 +83,10 @@ services:
     ports:
       - "5433:5432"
 
-  redis:
-    image: redis:6.2
-    ports:
-      - "6379:6379"
+  # redis:
+  #   image: redis:6.2
+  #   ports:
+  #     - "6379:6379"
 
   # Message Broker
   rabbitmq:
@@ -97,8 +99,8 @@ services:
       RABBITMQ_DEFAULT_PASS: guest
 
 volumes:
-  consul_data:
-  postgres_auth_data:
+  # consul_data:
+  # postgres_auth_data:
   postgres_jobs_data:
-  redis_data:
+  # redis_data:
   rabbitmq_data:

@@ -1,4 +1,3 @@
 # Placeholder requirements.txt
 fastapi
 uvicorn
--e ../shared
