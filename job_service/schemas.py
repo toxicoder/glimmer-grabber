@@ -41,3 +41,7 @@ class JobCreationRequest(BaseModel):
 class JobCreationResponse(BaseModel):
     jobId: int
     uploadUrl: str
+
+class JobStatusResponse(BaseModel):
+    status: str
+    results: Optional[List[Card]] = None
