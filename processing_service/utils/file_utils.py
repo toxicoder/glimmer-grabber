@@ -1,6 +1,8 @@
 import os
 import boto3
 import requests
+import hashlib
+from shared.models.models import ProcessedImage
 
 S3_BUCKET_NAME = os.environ.get("S3_BUCKET_NAME")
 
@@ -27,3 +29,11 @@ def download_image(url: str) -> bytes:
     except requests.exceptions.RequestException as e:
         print(f"Error downloading image from {url}: {e}")
         return b""
+
+def is_image_processed(image_bytes: bytes, db) -> bool:
+    """
+    Checks if an image has been processed before based on its hash.
+    """
+    image_hash = hashlib.sha256(image_bytes).hexdigest()
+    processed_image = db.query(ProcessedImage).filter(ProcessedImage.hash == image_hash).first()
+    return processed_image is not None

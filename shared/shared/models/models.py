@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+import datetime
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -33,6 +34,14 @@ class Card(Base):
     content = Column(String)
 
     job = relationship("ProcessingJob", back_populates="cards")
+
+
+class ProcessedImage(Base):
+    __tablename__ = "processed_images"
+
+    id = Column(Integer, primary_key=True, index=True)
+    hash = Column(String, unique=True, index=True)
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
 
     def __repr__(self):
         return f"<Card(id={self.id})>"
