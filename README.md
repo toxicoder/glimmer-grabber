@@ -37,6 +37,13 @@ graph TD
         Job_Service --> RabbitMQ("RabbitMQ");
         Processing_Service --> RabbitMQ;
     end
+
+    subgraph "Deployment"
+        subgraph "CI/CD"
+            Jenkins --> Docker("Docker build/push");
+        end
+        Docker --> Kubernetes("Kubernetes Cluster");
+    end
 ```
 
 ## Services
