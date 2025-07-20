@@ -5,3 +5,5 @@ pika
 psycopg2-binary
 sqlalchemy
 alembic
+python-jose[cryptography]
+pydantic-settings
