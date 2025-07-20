@@ -19,11 +19,13 @@ S3_BUCKET_NAME = os.environ.get("S3_BUCKET_NAME")
 S3_REGION = os.environ.get("S3_REGION")
 
 def get_s3_client():
+    if os.environ.get("TESTING"):
+        return boto3.client("s3", region_name="us-east-1")
     return boto3.client("s3", region_name=S3_REGION)
 
 # RabbitMQ configuration
-RABBITMQ_HOST = os.environ.get("RABBITMQ_HOST")
-RABBITMQ_QUEUE = os.environ.get("RABBITMQ_QUEUE")
+RABBITMQ_HOST = os.environ.get("RABBITMQ_HOST", "localhost")
+RABBITMQ_QUEUE = os.environ.get("RABBITMQ_QUEUE", "test_queue")
 
 def get_user_id_from_token(authorization: str = Header(None)):
     if os.environ.get("TESTING") and authorization:
@@ -67,7 +69,7 @@ def create_job(
     # Generate a pre-signed URL for S3
     presigned_url = s3_client.generate_presigned_url(
         "put_object",
-        Params={"Bucket": S3_BUCKET_NAME, "Key": object_key, "ContentType": job_request.contentType},
+        Params={"Bucket": os.environ.get("S3_BUCKET_NAME"), "Key": object_key, "ContentType": job_request.contentType},
         ExpiresIn=3600,
     )
 

@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from moto import mock_aws
 import boto3
 from unittest.mock import patch
+import os
 
 from job_service.app import app, get_db
 from shared.models.models import Base
@@ -33,24 +34,18 @@ app.dependency_overrides[get_db] = override_get_db
 client = TestClient(app)
 
 
-@pytest.fixture
-def mock_s3():
+@pytest.fixture(autouse=True)
+def mock_s3_bucket():
     with mock_aws():
         s3 = boto3.client("s3", region_name="us-east-1")
         s3.create_bucket(Bucket="test-bucket")
-        yield s3
-
-
-from job_service.app import get_s3_client
-
-def override_get_s3_client():
-    return boto3.client("s3", region_name="us-east-1")
-
-app.dependency_overrides[get_s3_client] = override_get_s3_client
+        os.environ["S3_BUCKET_NAME"] = "test-bucket"
+        os.environ["RABBITMQ_HOST"] = "localhost"
+        yield
 
 
 @patch("pika.BlockingConnection")
-def test_create_job(mock_pika, mock_s3):
+def test_create_job(mock_pika):
     response = client.post(
         "/api/v1/jobs",
         headers={"Authorization": "Bearer 1"},
@@ -63,7 +58,7 @@ def test_create_job(mock_pika, mock_s3):
 
 
 @patch("pika.BlockingConnection")
-def test_create_job_unauthorized(mock_pika, mock_s3):
+def test_create_job_unauthorized(mock_pika):
     response = client.post(
         "/api/v1/jobs",
         json={"filename": "test.txt", "contentType": "text/plain"},
@@ -78,7 +73,7 @@ def test_read_jobs():
 
 
 @patch("pika.BlockingConnection")
-def test_read_job(mock_pika, mock_s3):
+def test_read_job(mock_pika):
     # First, create a job to read
     response = client.post(
         "/api/v1/jobs",
@@ -99,7 +94,7 @@ def test_read_job_not_found():
 
 
 @patch("pika.BlockingConnection")
-def test_update_job(mock_pika, mock_s3):
+def test_update_job(mock_pika):
     # First, create a job to update
     response = client.post(
         "/api/v1/jobs",
@@ -115,7 +110,7 @@ def test_update_job(mock_pika, mock_s3):
 
 
 @patch("pika.BlockingConnection")
-def test_delete_job(mock_pika, mock_s3):
+def test_delete_job(mock_pika):
     # First, create a job to delete
     response = client.post(
         "/api/v1/jobs",
