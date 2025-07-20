@@ -1,5 +1,5 @@
 import datetime
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -12,6 +12,7 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+    is_active = Column(Boolean, default=True)
 
 class ProcessingJob(Base):
     __tablename__ = "processing_jobs"
@@ -44,4 +45,4 @@ class ProcessedImage(Base):
     timestamp = Column(DateTime, default=datetime.datetime.utcnow)
 
     def __repr__(self):
-        return f"<Card(id={self.id})>"
+        return f"<ProcessedImage(id={self.id})>"
