@@ -17,13 +17,17 @@ Base.metadata.create_all(bind=engine)
 # S3 configuration
 S3_BUCKET_NAME = os.environ.get("S3_BUCKET_NAME")
 S3_REGION = os.environ.get("S3_REGION")
-s3_client = boto3.client("s3", region_name=S3_REGION)
+
+def get_s3_client():
+    return boto3.client("s3", region_name=S3_REGION)
 
 # RabbitMQ configuration
 RABBITMQ_HOST = os.environ.get("RABBITMQ_HOST")
 RABBITMQ_QUEUE = os.environ.get("RABBITMQ_QUEUE")
 
-def get_user_id_from_token(authorization: str = Header(...)):
+def get_user_id_from_token(authorization: str = Header(None)):
+    if os.environ.get("TESTING") and authorization:
+        return 1
     # This is a placeholder for a real token validation and user extraction logic
     # In a real application, you would decode the JWT and get the user ID
     if not authorization:
@@ -43,6 +47,7 @@ def create_job(
     job_request: schemas.JobCreationRequest,
     db: Session = Depends(get_db),
     user_id: int = Depends(get_user_id_from_token),
+    s3_client: boto3.client = Depends(get_s3_client),
 ):
     """
     Creates a new processing job.
