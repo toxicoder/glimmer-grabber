@@ -5,3 +5,6 @@ numpy
 Pillow
 requests
 celery
+boto3
+opencv-python
+pytesseract
