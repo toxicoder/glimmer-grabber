@@ -14,20 +14,29 @@ The application is composed of the following services:
 
 ### Architecture Diagram
 
-```
-+----------+      +-------------+      +---------------------+
-|          |      |             |      |                     |
-| Frontend |----->| API Gateway |----->| Authentication Ser. |
-|          |      |             |      |                     |
-+----------+      +-------------+      +---------------------+
-      ^              |
-      |              |
-      v              v
-+----------+      +-------------+      +---------------------+
-|          |      |             |      |                     |
-| User     |<---->| Job Service |<---->| Processing Service  |
-|          |      |             |      |                     |
-+----------+      +-------------+      +---------------------+
+```mermaid
+graph TD
+    subgraph "User Interface"
+        User("User") --> Frontend("Frontend");
+    end
+
+    subgraph "Backend Services"
+        Frontend --> API_Gateway("API Gateway");
+        API_Gateway --> Auth_Service("Authentication Service");
+        API_Gateway --> Job_Service("Job Service");
+        Job_Service --> Processing_Service("Processing Service");
+    end
+
+    subgraph "Data Stores"
+        Auth_Service --> Postgres_Auth("PostgreSQL (Auth)");
+        Job_Service --> Postgres_Jobs("PostgreSQL (Jobs)");
+        Processing_Service --> Redis("Redis");
+    end
+
+    subgraph "Message Broker"
+        Job_Service --> RabbitMQ("RabbitMQ");
+        Processing_Service --> RabbitMQ;
+    end
 ```
 
 ## Services
