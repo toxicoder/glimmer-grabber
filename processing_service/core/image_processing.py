@@ -16,11 +16,35 @@ def preprocess_image(image_bytes: bytes) -> np.ndarray:
 
 def segment_cards(image: np.ndarray) -> list[np.ndarray]:
     """
-    Segments the image to find individual cards.
+    Segments the image to find individual cards using Canny edge detection.
     """
-    # Placeholder for card segmentation logic
-    # In a real application, you would use contour detection or other methods
-    return [image]
+    # Canny edge detection
+    edges = cv2.Canny(image, 100, 200)
+
+    # Find contours
+    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Filter contours based on area and aspect ratio
+    card_images = []
+    for contour in contours:
+        # Approximate the contour to a polygon
+        perimeter = cv2.arcLength(contour, True)
+        approx = cv2.approxPolyDP(contour, 0.02 * perimeter, True)
+
+        # Check if the contour is a rectangle
+        if len(approx) == 4:
+            # Get the bounding box of the contour
+            x, y, w, h = cv2.boundingRect(approx)
+
+            # Filter based on aspect ratio and area to identify cards
+            aspect_ratio = w / float(h)
+            area = cv2.contourArea(contour)
+            if 0.5 < aspect_ratio < 1.5 and area > 1000:
+                # Crop the card from the original image
+                card_image = image[y : y + h, x : x + w]
+                card_images.append(card_image)
+
+    return card_images
 
 def ocr_card(card_image: np.ndarray) -> str:
     """

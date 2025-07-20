@@ -9,7 +9,7 @@ from shared.models.models import ProcessedImage
 
 logger = setup_logging()
 
-@celery_app.task
+@celery_app.task(autoretry_for=(Exception,), max_retries=3, default_retry_delay=60)
 def process_image_task(jobId, image_key):
     """
     Celery task to process an image and extract data.
@@ -58,3 +58,4 @@ def process_image_task(jobId, image_key):
         job.error_message = str(e)
         db.commit()
         logger.error(f"Job {jobId} failed: {e}")
+        raise

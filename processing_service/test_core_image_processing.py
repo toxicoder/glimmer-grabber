@@ -2,6 +2,7 @@ import unittest
 import numpy as np
 from PIL import Image
 import io
+import cv2
 
 from processing_service.core.image_processing import (
     preprocess_image,
@@ -23,8 +24,9 @@ class TestCoreImageProcessing(unittest.TestCase):
         self.assertEqual(len(preprocessed_image.shape), 2)  # Grayscale
 
     def test_segment_cards(self):
-        # Create a dummy image
-        image = np.zeros((200, 200), dtype=np.uint8)
+        # Create a dummy image with a black rectangle on a white background
+        image = np.full((200, 200), 255, dtype=np.uint8)
+        cv2.rectangle(image, (50, 50), (150, 150), 0, -1)
         card_images = segment_cards(image)
         self.assertIsInstance(card_images, list)
         self.assertGreater(len(card_images), 0)
