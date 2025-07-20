@@ -1,8 +1,13 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from auth_service.config import settings
 
-engine = create_engine(settings.DATABASE_URL)
+if os.environ.get("TESTING"):
+    engine = create_engine("sqlite:///./test.db", connect_args={"check_same_thread": False})
+else:
+    engine = create_engine(settings.DATABASE_URL)
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def get_db():
