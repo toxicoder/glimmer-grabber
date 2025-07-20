@@ -10,6 +10,10 @@ const Home = () => {
       <Link to="/register">Register</Link>
       <br />
       <Link to="/profile">Profile</Link>
+      <br />
+      <Link to="/jobs">Jobs</Link>
+      <br />
+      <Link to="/collection">Collection</Link>
     </div>
   );
 };
