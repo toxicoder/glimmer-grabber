@@ -64,6 +64,36 @@ def test_create_job_unauthorized(mock_pika):
     assert response.status_code == 401
 
 
+@patch("pika.BlockingConnection")
+def test_create_job_missing_filename(mock_pika):
+    response = client.post(
+        "/api/v1/jobs",
+        headers={"Authorization": "Bearer 1"},
+        json={"contentType": "image/jpeg"},
+    )
+    assert response.status_code == 422
+
+
+@patch("pika.BlockingConnection")
+def test_create_job_missing_content_type(mock_pika):
+    response = client.post(
+        "/api/v1/jobs",
+        headers={"Authorization": "Bearer 1"},
+        json={"filename": "test.txt"},
+    )
+    assert response.status_code == 422
+
+
+@patch("pika.BlockingConnection")
+def test_create_job_invalid_content_type(mock_pika):
+    response = client.post(
+        "/api/v1/jobs",
+        headers={"Authorization": "Bearer 1"},
+        json={"filename": "test.txt", "contentType": "application/json"},
+    )
+    assert response.status_code == 400
+
+
 def test_read_jobs():
     response = client.get("/jobs/")
     assert response.status_code == 200

@@ -50,7 +50,17 @@ def ocr_card(card_image: np.ndarray) -> str:
     """
     Performs OCR on a card image to extract text.
     """
-    text = pytesseract.image_to_string(card_image)
+    # Convert to grayscale if the image is not already
+    if len(card_image.shape) == 3:
+        gray = cv2.cvtColor(card_image, cv2.COLOR_BGR2GRAY)
+    else:
+        gray = card_image
+
+    # Apply thresholding to binarize the image
+    _, thresh = cv2.threshold(gray, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+
+    # Perform OCR on the processed image
+    text = pytesseract.image_to_string(thresh)
     return text
 
 def process_image(image_bytes: bytes) -> list[str]:
