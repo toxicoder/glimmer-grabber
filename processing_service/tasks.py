@@ -18,7 +18,7 @@ class DataExtractionError(Exception):
     pass
 
 @celery_app.task(autoretry_for=(Exception,), max_retries=3, default_retry_delay=60)
-def process_image_task(jobId, image_key):
+def process_image_task(jobId: int, image_key: str) -> None:
     """
     Celery task to process an image and extract data.
     """

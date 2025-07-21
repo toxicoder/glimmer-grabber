@@ -1,6 +1,6 @@
 import logging
 
-def setup_logging():
+def setup_logging() -> logging.Logger:
     """
     Sets up basic logging for the application.
     """

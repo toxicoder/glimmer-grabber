@@ -28,7 +28,9 @@ def download_image(url: str) -> bytes:
         print(f"Error downloading image from {url}: {e}")
         return b""
 
-def is_image_processed(image_bytes: bytes, db) -> bool:
+from sqlalchemy.orm import Session
+
+def is_image_processed(image_bytes: bytes, db: Session) -> bool:
     """
     Checks if an image has been processed before based on its hash.
     """

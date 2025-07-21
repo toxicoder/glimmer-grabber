@@ -22,7 +22,7 @@ Base.metadata.create_all(bind=engine)
 
 cache = TTLCache(maxsize=100, ttl=300)
 
-def get_s3_client():
+def get_s3_client() -> boto3.client:
     """
     Returns a boto3 S3 client.
     """
@@ -32,7 +32,7 @@ def get_s3_client():
 
 from jose import JWTError, jwt
 
-def get_user_id_from_token(authorization: str = Header(None)):
+def get_user_id_from_token(authorization: str = Header(None)) -> int:
     """
     Validates the JWT token and returns the user ID.
     """
@@ -62,7 +62,7 @@ def create_job(
     db: Session = Depends(get_db),
     user_id: int = Depends(get_user_id_from_token),
     s3_client: boto3.client = Depends(get_s3_client),
-):
+) -> schemas.JobCreationResponse:
     """
     Creates a new processing job.
     """
@@ -112,7 +112,7 @@ def create_job(
     return {"jobId": db_job.id, "uploadUrl": presigned_url}
 
 @app.get("/jobs/", response_model=List[schemas.ProcessingJob])
-def read_jobs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def read_jobs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)) -> List[schemas.ProcessingJob]:
     """
     Retrieves a list of processing jobs.
     """
@@ -125,7 +125,7 @@ def read_jobs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Database error")
 
 @app.get("/api/v1/jobs/{job_id}", response_model=schemas.JobStatusResponse)
-def read_job(job_id: int, db: Session = Depends(get_db), user_id: int = Depends(get_user_id_from_token)):
+def read_job(job_id: int, db: Session = Depends(get_db), user_id: int = Depends(get_user_id_from_token)) -> schemas.JobStatusResponse:
     """
     Retrieves the status of a specific processing job.
     """
@@ -146,7 +146,7 @@ def read_job(job_id: int, db: Session = Depends(get_db), user_id: int = Depends(
         raise HTTPException(status_code=500, detail="Database error")
 
 @app.put("/jobs/{job_id}", response_model=schemas.ProcessingJob)
-def update_job(job_id: int, job: schemas.ProcessingJobCreate, db: Session = Depends(get_db)):
+def update_job(job_id: int, job: schemas.ProcessingJobCreate, db: Session = Depends(get_db)) -> schemas.ProcessingJob:
     """
     Updates a processing job.
     """
@@ -168,7 +168,7 @@ def update_job(job_id: int, job: schemas.ProcessingJobCreate, db: Session = Depe
         raise HTTPException(status_code=500, detail="Database error")
 
 @app.delete("/jobs/{job_id}", response_model=schemas.ProcessingJob)
-def delete_job(job_id: int, db: Session = Depends(get_db)):
+def delete_job(job_id: int, db: Session = Depends(get_db)) -> schemas.ProcessingJob:
     """
     Deletes a processing job.
     """
@@ -189,7 +189,7 @@ def delete_job(job_id: int, db: Session = Depends(get_db)):
 
 @app.get("/api/v1/collections", response_model=List[schemas.Card])
 @cached(cache)
-def get_collection(db: Session = Depends(get_db), user_id: int = Depends(get_user_id_from_token)):
+def get_collection(db: Session = Depends(get_db), user_id: int = Depends(get_user_id_from_token)) -> List[schemas.Card]:
     """
     Retrieves all cards for the authenticated user.
     """
