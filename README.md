@@ -16,33 +16,17 @@ The application is composed of the following services:
 
 ```mermaid
 graph TD
-    subgraph "User Interface"
-        User("User") --> Frontend("Frontend");
-    end
-
     subgraph "Backend Services"
-        Frontend --> API_Gateway("API Gateway");
-        API_Gateway --> Auth_Service("Authentication Service");
-        API_Gateway --> Job_Service("Job Service");
-        Job_Service --> Processing_Service("Processing Service");
+        Job_Service("Job Service");
     end
 
     subgraph "Data Stores"
-        Auth_Service --> Postgres_Auth("PostgreSQL (Auth)");
         Job_Service --> Postgres_Jobs("PostgreSQL (Jobs)");
-        Processing_Service --> Redis("Redis");
+        Job_Service --> Redis("Redis");
     end
 
     subgraph "Message Broker"
         Job_Service --> RabbitMQ("RabbitMQ");
-        Processing_Service --> RabbitMQ;
-    end
-
-    subgraph "Deployment"
-        subgraph "CI/CD"
-            Jenkins --> Docker("Docker build/push");
-        end
-        Docker --> Kubernetes("Kubernetes Cluster");
     end
 ```
 
@@ -50,25 +34,9 @@ graph TD
 
 This section provides a brief overview of each service in the application.
 
-### Frontend
-
-The frontend is a React-based single-page application that provides the user interface for the application. It is located in the `frontend` directory.
-
-### API Gateway
-
-The API gateway is a single entry point for all client requests. It routes requests to the appropriate backend service. It is located in the `api_gateway` directory.
-
-### Authentication Service
-
-The authentication service handles user authentication and authorization. It is located in the `auth_service` directory.
-
 ### Job Service
 
 The job service manages jobs, including creating, updating, and deleting them. It is located in the `job_service` directory.
-
-### Processing Service
-
-The processing service processes jobs that are submitted by users. It is located in the `processing_service` directory.
 
 ## Getting Started
 
