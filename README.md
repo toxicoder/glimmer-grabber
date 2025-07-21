@@ -16,37 +16,118 @@ The application is composed of the following services:
 
 ```mermaid
 graph TD
+    subgraph "User Interface"
+        Frontend("Frontend (React)");
+    end
+
+    subgraph "API Gateway"
+        API_Gateway("API Gateway");
+    end
+
     subgraph "Backend Services"
+        Auth_Service("Authentication Service");
         Job_Service("Job Service");
+        Processing_Service("Processing Service");
+    end
+
+    subgraph "Service Discovery"
+        Consul("Consul");
     end
 
     subgraph "Data Stores"
-        Job_Service --> Postgres_Jobs("PostgreSQL (Jobs)");
-        Job_Service --> Redis("Redis");
+        Postgres_Auth("PostgreSQL (Auth)");
+        Postgres_Jobs("PostgreSQL (Jobs)");
+        Redis("Redis");
     end
 
     subgraph "Message Broker"
-        Job_Service --> RabbitMQ("RabbitMQ");
+        RabbitMQ("RabbitMQ");
     end
+
+    Frontend --> API_Gateway;
+    API_Gateway --> Auth_Service;
+    API_Gateway --> Job_Service;
+    API_Gateway --> Processing_Service;
+
+    Auth_Service --> Postgres_Auth;
+    Job_Service --> Postgres_Jobs;
+    Job_Service --> RabbitMQ;
+    Processing_Service --> Redis;
+    Processing_Service --> RabbitMQ;
+
+    Auth_Service --> Consul;
+    Job_Service --> Consul;
+    Processing_Service --> Consul;
 ```
 
 ## Services
 
 This section provides a brief overview of each service in the application.
 
+### API Gateway
+
+The API gateway is the single entry point for all client requests. It is responsible for routing requests to the appropriate backend service, as well as for handling authentication and rate limiting. It is located in the `api_gateway` directory.
+
+### Authentication Service
+
+The authentication service is responsible for handling user authentication and authorization. It manages user accounts and provides a secure way for users to log in to the application. It is located in the `auth_service` directory.
+
 ### Job Service
 
 The job service manages jobs, including creating, updating, and deleting them. It is located in the `job_service` directory.
 
+### Processing Service
+
+The processing service is responsible for processing jobs that are submitted by users. It is a background service that consumes jobs from the message broker and performs the required processing. It is located in the `processing_service` directory.
+
+### Frontend
+
+The frontend is a React-based single-page application that provides the user interface for the application. It is located in the `frontend` directory.
+
+### Data Stores
+
+The application uses several data stores to persist data:
+
+*   **PostgreSQL (Authentication):** This database stores user account information for the authentication service.
+*   **PostgreSQL (Jobs):** This database stores job information for the job service.
+*   **Redis:** This is used as a cache and for other purposes by the processing service.
+
+### Message Broker
+
+The application uses RabbitMQ as a message broker to enable asynchronous communication between services. The job service produces messages that are consumed by the processing service.
+
 ## Getting Started
 
-To get started with this project, you will need to have Docker and Docker Compose installed on your machine. Once you have them installed, you can run the following command to start the application:
+To get started with this project, you will need to have Docker and Docker Compose installed on your machine.
 
-```bash
-docker-compose up
-```
+### Prerequisites
 
-This will start all of the services in the application. You can then access the frontend application by navigating to `http://localhost:3000` in your web browser.
+*   [Docker](https://docs.docker.com/get-docker/)
+*   [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Installation
+
+1.  Clone the repository:
+
+    ```bash
+    git clone https://github.com/your-username/your-repository.git
+    ```
+
+2.  Create a `.env` file by copying the `.env.example` file:
+
+    ```bash
+    cp .env.example .env
+    ```
+
+3.  Update the `.env` file with your own configuration values.
+
+4.  Start the application:
+
+    ```bash
+    docker-compose up
+    ```
+
+    This will start all of the services in the application. You can then access the frontend application by navigating to `http://localhost:3000` in your web browser.
 
 ## Contributing
 
