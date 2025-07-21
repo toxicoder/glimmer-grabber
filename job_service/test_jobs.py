@@ -91,7 +91,7 @@ def test_create_job_invalid_content_type(mock_pika):
         headers={"Authorization": "Bearer 1"},
         json={"filename": "test.txt", "contentType": "application/json"},
     )
-    assert response.status_code == 400
+    assert response.status_code == 422
 
 
 def test_read_jobs():
