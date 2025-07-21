@@ -1,4 +1,3 @@
-import os
 import boto3
 import pika
 from fastapi import FastAPI, Depends, HTTPException, Header
@@ -8,8 +7,9 @@ import uuid
 import logging
 from cachetools import cached, TTLCache
 
-from shared.database.database import get_db, engine
-from shared.models.models import ProcessingJob, Card, Base
+from shared.shared.database.database import get_db, engine
+from shared.shared.models.models import ProcessingJob, Card, Base
+from shared.config import settings
 from . import schemas
 
 app = FastAPI()
@@ -21,21 +21,13 @@ Base.metadata.create_all(bind=engine)
 
 cache = TTLCache(maxsize=100, ttl=300)
 
-# S3 configuration
-S3_BUCKET_NAME = os.environ.get("S3_BUCKET_NAME")
-S3_REGION = os.environ.get("S3_REGION")
-
 def get_s3_client():
     """
     Returns a boto3 S3 client.
     """
-    if os.environ.get("TESTING"):
+    if settings.TESTING:
         return boto3.client("s3", region_name="us-east-1")
-    return boto3.client("s3", region_name=S3_REGION)
-
-# RabbitMQ configuration
-RABBITMQ_HOST = os.environ.get("RABBITMQ_HOST", "localhost")
-RABBITMQ_QUEUE = os.environ.get("RABBITMQ_QUEUE", "test_queue")
+    return boto3.client("s3", region_name=settings.S3_REGION)
 
 from jose import JWTError, jwt
 
@@ -43,7 +35,7 @@ def get_user_id_from_token(authorization: str = Header(None)):
     """
     Validates the JWT token and returns the user ID.
     """
-    if os.environ.get("TESTING") and authorization:
+    if settings.TESTING and authorization:
         return 1
 
     if not authorization:
@@ -52,7 +44,7 @@ def get_user_id_from_token(authorization: str = Header(None)):
 
     token = authorization.split("Bearer ")[-1]
     try:
-        payload = jwt.decode(token, os.environ.get("SECRET_KEY"), algorithms=[os.environ.get("ALGORITHM")])
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         user_id: int = payload.get("sub")
         if user_id is None:
             logger.error("Invalid token: 'sub' field missing")
@@ -90,7 +82,7 @@ def create_job(
         # Generate a pre-signed URL for S3
         presigned_url = s3_client.generate_presigned_url(
             "put_object",
-            Params={"Bucket": os.environ.get("S3_BUCKET_NAME"), "Key": object_key, "ContentType": job_request.contentType},
+            Params={"Bucket": settings.S3_BUCKET_NAME, "Key": object_key, "ContentType": job_request.contentType},
             ExpiresIn=3600,
         )
     except Exception as e:
@@ -99,12 +91,12 @@ def create_job(
 
     try:
         # Publish a message to RabbitMQ
-        connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
+        connection = pika.BlockingConnection(pika.ConnectionParameters(host=settings.RABBITMQ_HOST))
         channel = connection.channel()
-        channel.queue_declare(queue=RABBITMQ_QUEUE)
+        channel.queue_declare(queue=settings.RABBITMQ_QUEUE)
         channel.basic_publish(
             exchange="",
-            routing_key=RABBITMQ_QUEUE,
+            routing_key=settings.RABBITMQ_QUEUE,
             body=str(db_job.id),
         )
         connection.close()

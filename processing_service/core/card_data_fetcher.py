@@ -1,15 +1,11 @@
-import os
 import redis
 import requests
 import json
-
-LORCANA_API_URL = os.environ.get("LORCANA_API_URL")
-REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
-REDIS_PORT = int(os.environ.get("REDIS_PORT", 6379))
+from shared.config import settings
 
 class CardDataFetcher:
     def __init__(self):
-        self.redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0)
+        self.redis_client = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0)
 
     def get_card_details(self, card_name: str) -> dict:
         """
@@ -25,7 +21,7 @@ class CardDataFetcher:
             pass
 
         try:
-            response = requests.get(f"{LORCANA_API_URL}/cards/{card_name}")
+            response = requests.get(f"{settings.LORCANA_API_URL}/cards/{card_name}")
             response.raise_for_status()
             card_details = response.json()
 

@@ -8,7 +8,7 @@ from unittest.mock import patch
 import os
 
 from job_service.app import app, get_db
-from shared.models.models import Base
+from shared.shared.models.models import Base
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 
@@ -39,8 +39,6 @@ def mock_s3_bucket():
     with mock_aws():
         s3 = boto3.client("s3", region_name="us-east-1")
         s3.create_bucket(Bucket="test-bucket")
-        os.environ["S3_BUCKET_NAME"] = "test-bucket"
-        os.environ["RABBITMQ_HOST"] = "localhost"
         yield
 
 
@@ -49,7 +47,7 @@ def test_create_job(mock_pika):
     response = client.post(
         "/api/v1/jobs",
         headers={"Authorization": "Bearer 1"},
-        json={"filename": "test.txt", "contentType": "text/plain"},
+        json={"filename": "test.txt", "contentType": "image/jpeg"},
     )
     assert response.status_code == 200
     data = response.json()
@@ -61,7 +59,7 @@ def test_create_job(mock_pika):
 def test_create_job_unauthorized(mock_pika):
     response = client.post(
         "/api/v1/jobs",
-        json={"filename": "test.txt", "contentType": "text/plain"},
+        json={"filename": "test.txt", "contentType": "image/jpeg"},
     )
     assert response.status_code == 401
 
@@ -78,7 +76,7 @@ def test_read_job(mock_pika):
     response = client.post(
         "/api/v1/jobs",
         headers={"Authorization": "Bearer 1"},
-        json={"filename": "test.txt", "contentType": "text/plain"},
+        json={"filename": "test.txt", "contentType": "image/jpeg"},
     )
     job_id = response.json()["jobId"]
 
@@ -99,7 +97,7 @@ def test_update_job(mock_pika):
     response = client.post(
         "/api/v1/jobs",
         headers={"Authorization": "Bearer 1"},
-        json={"filename": "test.txt", "contentType": "text/plain"},
+        json={"filename": "test.txt", "contentType": "image/jpeg"},
     )
     job_id = response.json()["jobId"]
 
@@ -115,7 +113,7 @@ def test_delete_job(mock_pika):
     response = client.post(
         "/api/v1/jobs",
         headers={"Authorization": "Bearer 1"},
-        json={"filename": "test.txt", "contentType": "text/plain"},
+        json={"filename": "test.txt", "contentType": "image/jpeg"},
     )
     job_id = response.json()["jobId"]
 
