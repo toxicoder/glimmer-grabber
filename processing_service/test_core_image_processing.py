@@ -4,6 +4,8 @@ from PIL import Image
 import io
 import cv2
 
+from fuzzywuzzy import fuzz
+
 from processing_service.core.image_processing import (
     preprocess_image,
     segment_cards,
@@ -33,13 +35,14 @@ class TestCoreImageProcessing(unittest.TestCase):
         self.assertIsInstance(card_images[0], np.ndarray)
 
     def test_ocr_card(self):
-        # Create a dummy image with some text
-        image = Image.new("L", (200, 50), color=255)
-        # This test requires tesseract to be installed and configured.
-        # For now, we'll just test that it returns a string.
-        # A more robust test would involve a known image and expected text.
-        text = ocr_card(np.array(image))
-        self.assertIsInstance(text, str)
+        # Load the test image
+        image = Image.open("processing_service/test_image.png")
+        # Convert the image to a numpy array
+        image_np = np.array(image)
+        # Perform OCR on the image
+        text = ocr_card(image_np)
+        # Check that the OCR text is correct
+        self.assertGreater(fuzz.ratio(text.strip(), "Hello, World!"), 80)
 
 
 if __name__ == "__main__":
