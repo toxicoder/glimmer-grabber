@@ -1,4 +1,6 @@
 import hashlib
+from botocore.exceptions import ClientError
+from sqlalchemy.exc import SQLAlchemyError
 from .celery_app import celery_app
 from .core.image_processing import process_image
 from .core.data_extraction import extract_data
@@ -8,6 +10,12 @@ from .database import get_db, ProcessingJob, Card
 from shared.models.models import ProcessedImage
 
 logger = setup_logging()
+
+class ImageProcessingError(Exception):
+    pass
+
+class DataExtractionError(Exception):
+    pass
 
 @celery_app.task(autoretry_for=(Exception,), max_retries=3, default_retry_delay=60)
 def process_image_task(jobId, image_key):
@@ -27,25 +35,31 @@ def process_image_task(jobId, image_key):
     db.commit()
 
     try:
-        image_bytes = download_image_from_s3(image_key)
+        try:
+            image_bytes = download_image_from_s3(image_key)
+        except ClientError as e:
+            raise ImageProcessingError(f"Error downloading image from S3: {e}")
+
         if is_image_processed(image_bytes, db):
             logger.info(f"Image in job {jobId} has already been processed. Skipping.")
             job.status = "COMPLETED"
             db.commit()
             return
 
-        # Replace with actual image processing logic
-        processed_data = process_image(image_bytes)
-        # Replace with actual data extraction logic
-        extracted_data = extract_data(processed_data)
+        try:
+            processed_data = process_image(image_bytes)
+        except Exception as e:
+            raise ImageProcessingError(f"Error processing image: {e}")
 
-        card_details = extract_data(processed_data)
+        try:
+            card_details = extract_data(processed_data)
+        except Exception as e:
+            raise DataExtractionError(f"Error extracting data: {e}")
 
         for card_data in card_details:
             card = Card(job_id=jobId, content=str(card_data))
             db.add(card)
 
-        # Store the hash of the processed image
         image_hash = hashlib.sha256(image_bytes).hexdigest()
         processed_image = ProcessedImage(hash=image_hash)
         db.add(processed_image)
@@ -53,7 +67,8 @@ def process_image_task(jobId, image_key):
         job.status = "COMPLETED"
         db.commit()
         logger.info(f"Job {jobId} completed successfully.")
-    except Exception as e:
+
+    except (ImageProcessingError, DataExtractionError, SQLAlchemyError) as e:
         job.status = "FAILED"
         job.error_message = str(e)
         db.commit()
