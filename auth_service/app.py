@@ -17,7 +17,7 @@ app = FastAPI()
 Base.metadata.create_all(bind=engine)
 
 @app.post("/api/v1/auth/register", response_model=UserSchema)
-def register_user(user: UserCreate, db: Session = Depends(get_db)):
+def register_user(user: UserCreate, db: Session = Depends(get_db)) -> UserSchema:
     db_user_by_email = db.query(User).filter(User.email == user.email).first()
     if db_user_by_email:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -32,7 +32,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     return db_user
 
 @app.post("/api/v1/auth/login", response_model=Token)
-def login(user_credentials: UserLogin, db: Session = Depends(get_db)):
+def login(user_credentials: UserLogin, db: Session = Depends(get_db)) -> Token:
     user = security.authenticate_user_by_email(db, email=user_credentials.email, password=user_credentials.password)
     if not user:
         raise HTTPException(
@@ -48,7 +48,7 @@ def login(user_credentials: UserLogin, db: Session = Depends(get_db)):
 
 
 @app.post("/token", response_model=Token)
-def login_for_access_token(form_data: security.OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login_for_access_token(form_data: security.OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)) -> Token:
     user = security.authenticate_user_by_username(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -64,9 +64,9 @@ def login_for_access_token(form_data: security.OAuth2PasswordRequestForm = Depen
 
 
 @app.get("/users/me/", response_model=UserSchema)
-def read_users_me(current_user: User = Depends(security.get_current_active_user)):
+def read_users_me(current_user: User = Depends(security.get_current_active_user)) -> UserSchema:
     return current_user
 
 @app.get("/")
-def read_root():
+def read_root() -> dict:
     return {"Hello": "Auth Service"}

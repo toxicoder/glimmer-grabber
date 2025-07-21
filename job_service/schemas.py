@@ -32,13 +32,14 @@ class ProcessingJob(ProcessingJobBase):
         orm_mode = True
 
 from pydantic import validator
+from typing import Any, Type
 
 class JobCreationRequest(BaseModel):
     filename: str
     contentType: str
 
     @validator("contentType")
-    def validate_content_type(cls, value):
+    def validate_content_type(cls: Type['JobCreationRequest'], value: str) -> str:
         if value not in ["image/jpeg", "image/png", "image/gif"]:
             raise ValueError("Unsupported content type")
         return value

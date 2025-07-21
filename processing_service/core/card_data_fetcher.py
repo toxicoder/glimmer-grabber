@@ -4,7 +4,7 @@ import json
 from shared.config import settings
 
 class CardDataFetcher:
-    def __init__(self):
+    def __init__(self) -> None:
         self.redis_client = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0)
 
     def get_card_details(self, card_name: str) -> dict:

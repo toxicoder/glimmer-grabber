@@ -24,7 +24,7 @@ class ProcessingJob(Base):
 
     cards = relationship("Card", back_populates="job")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<ProcessingJob(id={self.id}, status='{self.status}')>"
 
 class Card(Base):
@@ -44,5 +44,5 @@ class ProcessedImage(Base):
     hash = Column(String, unique=True, index=True)
     timestamp = Column(DateTime, default=datetime.datetime.utcnow)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<ProcessedImage(id={self.id})>"
