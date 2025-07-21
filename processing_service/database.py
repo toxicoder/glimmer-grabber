@@ -1,11 +1,9 @@
-import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from shared.models.models import ProcessingJob, Card, Base
+from shared.shared.models.models import ProcessingJob, Card, Base
+from shared.config import settings
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://user:password@postgres/database")
-
-engine = create_engine(DATABASE_URL)
+engine = create_engine(settings.DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def get_db():
