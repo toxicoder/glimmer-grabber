@@ -1,6 +1,31 @@
-# Project Title
+# Image Processing Microservice Application
 
-This project is a microservices-based application for processing and managing jobs. It consists of a frontend application, an API gateway, and several backend services for authentication, job handling, and processing.
+This project is a comprehensive, microservices-based application designed for processing and managing image-related jobs. It features a modern frontend built with React, an API gateway to route requests, and a suite of backend services for user authentication, job management, and image processing.
+
+## Table of Contents
+
+*   [Architecture](#architecture)
+*   [Technologies Used](#technologies-used)
+*   [Services](#services)
+    *   [API Gateway](#api-gateway)
+    *   [Authentication Service](#authentication-service)
+    *   [Job Service](#job-service)
+    *   [Processing Service](#processing-service)
+    *   [Frontend](#frontend)
+*   [Getting Started](#getting-started)
+    *   [Prerequisites](#prerequisites)
+    *   [Installation](#installation)
+*   [Contributing](#contributing)
+    *   [Development Environment](#development-environment)
+    *   [Testing](#testing)
+
+## Technologies Used
+
+*   **Frontend:** React, Vite, Tailwind CSS
+*   **Backend:** Node.js (API Gateway), Python (Auth, Job, Processing Services)
+*   **Databases:** PostgreSQL, Redis
+*   **Messaging:** RabbitMQ
+*   **Containerization:** Docker, Docker Compose
 
 ## Architecture
 
@@ -62,39 +87,63 @@ graph TD
 
 ## Services
 
-This section provides a brief overview of each service in the application.
+This section provides a more detailed overview of each service in the application.
 
 ### API Gateway
 
-The API gateway is the single entry point for all client requests. It is responsible for routing requests to the appropriate backend service, as well as for handling authentication and rate limiting. It is located in the `api_gateway` directory.
+*   **Location:** `api_gateway`
+*   **Technology:** Node.js, Express
+*   **Responsibilities:**
+    *   Acts as a single entry point for all client requests.
+    *   Routes requests to the appropriate backend service.
+    *   Handles authentication and rate limiting.
 
 ### Authentication Service
 
-The authentication service is responsible for handling user authentication and authorization. It manages user accounts and provides a secure way for users to log in to the application. It is located in the `auth_service` directory.
+*   **Location:** `auth_service`
+*   **Technology:** Python, Flask, PostgreSQL
+*   **Responsibilities:**
+    *   Manages user accounts and authentication.
+    *   Provides JWT-based authentication for securing endpoints.
+    *   Handles user registration and login.
 
 ### Job Service
 
-The job service manages jobs, including creating, updating, and deleting them. It is located in the `job_service` directory.
+*   **Location:** `job_service`
+*   **Technology:** Python, FastAPI, PostgreSQL, RabbitMQ
+*   **Responsibilities:**
+    *   Manages job creation, updates, and status tracking.
+    *   Publishes job requests to the message broker for asynchronous processing.
+    *   Provides endpoints for retrieving job status and results.
 
 ### Processing Service
 
-The processing service is responsible for processing jobs that are submitted by users. It is a background service that consumes jobs from the message broker and performs the required processing. It is located in the `processing_service` directory.
+*   **Location:** `processing_service`
+*   **Technology:** Python, Celery, RabbitMQ, Redis
+*   **Responsibilities:**
+    *   Consumes job requests from the message broker.
+    *   Performs the core image processing tasks in the background.
+    *   Updates the job status and stores the results.
 
 ### Frontend
 
-The frontend is a React-based single-page application that provides the user interface for the application. It is located in the `frontend` directory.
+*   **Location:** `my-react-app`
+*   **Technology:** React, Vite, Tailwind CSS
+*   **Responsibilities:**
+    *   Provides a user-friendly interface for interacting with the application.
+    *   Allows users to upload images, manage jobs, and view results.
+    *   Communicates with the backend services through the API gateway.
 
 ### Data Stores
 
-The application uses several data stores to persist data:
+The application uses the following data stores to persist data:
 
-*   **PostgreSQL (Authentication):** This database stores user account information for the authentication service.
-*   **PostgreSQL (Jobs):** This database stores job information for the job service.
-*   **Redis:** This is used as a cache and for other purposes by the processing service.
+*   **PostgreSQL:** Used by the `auth_service` to store user account information and by the `job_service` to manage job data.
+*   **Redis:** Used by the `processing_service` for caching and other temporary data storage needs.
 
 ### Message Broker
 
-The application uses RabbitMQ as a message broker to enable asynchronous communication between services. The job service produces messages that are consumed by the processing service.
+*   **RabbitMQ:** Used as a message broker to enable asynchronous communication between the `job_service` and the `processing_service`.
 
 ## Getting Started
 
@@ -107,27 +156,32 @@ To get started with this project, you will need to have Docker and Docker Compos
 
 ### Installation
 
-1.  Clone the repository:
+1.  **Clone the repository:**
 
     ```bash
     git clone https://github.com/your-username/your-repository.git
+    cd your-repository
     ```
 
-2.  Create a `.env` file by copying the `.env.example` file:
+2.  **Create a `.env` file:**
+
+    Copy the `.env.example` file to a new `.env` file:
 
     ```bash
     cp .env.example .env
     ```
 
-3.  Update the `.env` file with your own configuration values.
+    Update the `.env` file with your own configuration values for the services.
 
-4.  Start the application:
+3.  **Start the application:**
 
     ```bash
-    docker-compose up
+    docker-compose up -d
     ```
 
-    This will start all of the services in the application. You can then access the frontend application by navigating to `http://localhost:3000` in your web browser.
+    This will start all of the services in detached mode. You can then access the frontend application by navigating to `http://localhost:5173` in your web browser.
+
+    **Note:** The frontend application is located in the `my-react-app` directory and is served by Vite, which runs on port 5173 by default.
 
 ## Contributing
 
@@ -151,10 +205,30 @@ This will build the Docker images for all of the services and start them.
 
 ### Testing
 
-To run the tests for a specific service, you can use the following command:
+To run the tests for a specific service, you can use the `docker-compose run` command. The services with tests are `auth_service`, `job_service`, and `processing_service`.
 
-```bash
-docker-compose run <service_name> pytest
-```
+*   **Run tests for the Authentication Service:**
 
-Replace `<service_name>` with the name of the service that you want to test.
+    ```bash
+    docker-compose run auth_service pytest
+    ```
+
+*   **Run tests for the Job Service:**
+
+    ```bash
+    docker-compose run job_service pytest
+    ```
+
+*   **Run tests for the Processing Service:**
+
+    ```bash
+    docker-compose run processing_service pytest
+    ```
+
+*   **Run all tests at once:**
+
+    You can run all tests for all services by executing the `run_tests.sh` script:
+
+    ```bash
+    ./run_tests.sh
+    ```
