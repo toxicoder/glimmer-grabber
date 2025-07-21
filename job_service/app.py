@@ -24,11 +24,24 @@ cache = TTLCache(maxsize=100, ttl=300)
 
 def get_s3_client() -> boto3.client:
     """
-    Returns a boto3 S3 client.
+    Returns a boto3 S3 client configured for MinIO.
     """
     if settings.TESTING:
         return boto3.client("s3", region_name="us-east-1")
-    return boto3.client("s3", region_name=settings.S3_REGION)
+
+    s3_client = boto3.client(
+        "s3",
+        endpoint_url=settings.MINIO_ENDPOINT,
+        aws_access_key_id=settings.MINIO_ACCESS_KEY,
+        aws_secret_access_key=settings.MINIO_SECRET_KEY,
+        region_name=settings.S3_REGION,
+    )
+    # Create the bucket if it doesn't exist
+    try:
+        s3_client.head_bucket(Bucket=settings.S3_BUCKET_NAME)
+    except Exception:
+        s3_client.create_bucket(Bucket=settings.S3_BUCKET_NAME)
+    return s3_client
 
 from jose import JWTError, jwt
 

@@ -8,7 +8,13 @@ def download_image_from_s3(image_key: str) -> bytes:
     """
     Downloads an image from S3 and returns its content as bytes.
     """
-    s3 = boto3.client("s3")
+    s3 = boto3.client(
+        "s3",
+        endpoint_url=settings.MINIO_ENDPOINT,
+        aws_access_key_id=settings.MINIO_ACCESS_KEY,
+        aws_secret_access_key=settings.MINIO_SECRET_KEY,
+        region_name=settings.S3_REGION,
+    )
     try:
         response = s3.get_object(Bucket=settings.S3_BUCKET_NAME, Key=image_key)
         return response["Body"].read()
