@@ -9,6 +9,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "http-proxy-middleware": "^2.0.1",
-    "consul": "^0.40.0"
+"consul": "^0.40.0",
+"jsonwebtoken": "^8.5.1"
   }
 }
