@@ -4,11 +4,21 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();
 
+const jwt = require('jsonwebtoken');
+
 const authMiddleware = (req, res, next) => {
-  if (req.headers.authorization) {
-    next();
+  const authHeader = req.headers.authorization;
+  if (authHeader) {
+    const token = authHeader.split(' ')[1];
+    jwt.verify(token, 'your_secret_key', (err, user) => {
+      if (err) {
+        return res.sendStatus(403);
+      }
+      req.user = user;
+      next();
+    });
   } else {
-    res.status(401).send('Unauthorized');
+    res.sendStatus(401);
   }
 };
 
