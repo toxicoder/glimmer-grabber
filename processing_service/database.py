@@ -1,9 +1,11 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from shared.shared.models.models import ProcessingJob, Card, Base
-from shared.config import settings
+from shared.config import get_settings
 
-engine = create_engine(settings.DATABASE_URL)
+settings = get_settings()
+
+engine = create_engine(settings.database_url)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 from typing import Generator

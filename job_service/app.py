@@ -10,7 +10,9 @@ from cachetools import cached, TTLCache
 
 from shared.shared.database.database import get_db, engine
 from shared.shared.models.models import ProcessingJob, Card, Base
-from shared.config import settings
+from shared.config import get_settings
+
+settings = get_settings()
 from . import schemas
 
 app = FastAPI()
@@ -26,21 +28,20 @@ def get_s3_client() -> boto3.client:
     """
     Returns a boto3 S3 client configured for MinIO.
     """
-    if settings.TESTING:
+    if settings.testing:
         return boto3.client("s3", region_name="us-east-1")
-
     s3_client = boto3.client(
         "s3",
-        endpoint_url=settings.MINIO_ENDPOINT,
-        aws_access_key_id=settings.MINIO_ACCESS_KEY,
-        aws_secret_access_key=settings.MINIO_SECRET_KEY,
-        region_name=settings.S3_REGION,
+        endpoint_url=settings.minio_endpoint,
+        aws_access_key_id=settings.minio_access_key,
+        aws_secret_access_key=settings.minio_secret_key,
+        region_name=settings.s3_region,
     )
     # Create the bucket if it doesn't exist
     try:
-        s3_client.head_bucket(Bucket=settings.S3_BUCKET_NAME)
+        s3_client.head_bucket(Bucket=settings.s3_bucket_name)
     except Exception:
-        s3_client.create_bucket(Bucket=settings.S3_BUCKET_NAME)
+        s3_client.create_bucket(Bucket=settings.s3_bucket_name)
     return s3_client
 
 from jose import JWTError, jwt
@@ -49,7 +50,7 @@ def get_user_id_from_token(authorization: str = Header(None)) -> int:
     """
     Validates the JWT token and returns the user ID.
     """
-    if settings.TESTING and authorization:
+    if settings.testing and authorization:
         return 1
 
     if not authorization:
@@ -96,7 +97,7 @@ def create_job(
         # Generate a pre-signed URL for S3
         presigned_url = s3_client.generate_presigned_url(
             "put_object",
-            Params={"Bucket": settings.S3_BUCKET_NAME, "Key": object_key, "ContentType": job_request.contentType},
+            Params={"Bucket": settings.s3_bucket_name, "Key": object_key, "ContentType": job_request.contentType},
             ExpiresIn=3600,
         )
     except Exception as e:
@@ -105,12 +106,12 @@ def create_job(
 
     try:
         # Publish a message to RabbitMQ
-        connection = pika.BlockingConnection(pika.ConnectionParameters(host=settings.RABBITMQ_HOST))
+        connection = pika.BlockingConnection(pika.ConnectionParameters(host=settings.rabbitmq_host))
         channel = connection.channel()
-        channel.queue_declare(queue=settings.RABBITMQ_QUEUE)
+        channel.queue_declare(queue=settings.rabbitmq_queue)
         channel.basic_publish(
             exchange="",
-            routing_key=settings.RABBITMQ_QUEUE,
+            routing_key=settings.rabbitmq_queue,
             body=str(db_job.id),
         )
         connection.close()

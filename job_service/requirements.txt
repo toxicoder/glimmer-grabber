@@ -8,3 +8,5 @@ alembic
 python-jose[cryptography]
 pydantic-settings
 cachetools
+httpx
+moto

@@ -1,0 +1,35 @@
+import os
+from unittest import TestCase
+from unittest.mock import patch
+from job_service.config import get_settings
+
+class TestConfig(TestCase):
+    @patch.dict(os.environ, {"DATABASE_URL": "test_db_url"})
+    def test_get_settings_with_db_url(self):
+        settings = get_settings()
+        self.assertEqual(settings.database_url, "test_db_url")
+
+    @patch.dict(os.environ, {}, clear=True)
+    def test_get_settings_without_db_url(self):
+        with self.assertRaises(ValueError):
+            get_settings()
+
+    @patch.dict(os.environ, {"RABBITMQ_URL": "test_rabbit_url"})
+    def test_get_settings_with_rabbitmq_url(self):
+        settings = get_settings()
+        self.assertEqual(settings.rabbitmq_url, "test_rabbit_url")
+
+    @patch.dict(os.environ, {}, clear=True)
+    def test_get_settings_without_rabbitmq_url(self):
+        with self.assertRaises(ValueError):
+            get_settings()
+
+    @patch.dict(os.environ, {"AWS_S3_BUCKET": "test_bucket"})
+    def test_get_settings_with_aws_s3_bucket(self):
+        settings = get_settings()
+        self.assertEqual(settings.aws_s3_bucket, "test_bucket")
+
+    @patch.dict(os.environ, {}, clear=True)
+    def test_get_settings_without_aws_s3_bucket(self):
+        with self.assertRaises(ValueError):
+            get_settings()

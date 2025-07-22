@@ -1,45 +1,33 @@
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from moto import mock_aws
-import boto3
 from unittest.mock import patch
-import os
+import boto3
 
 from job_service.app import app, get_db
 from shared.shared.models.models import Base
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-
-Base.metadata.create_all(bind=engine)
-
-
-def override_get_db():
-    try:
-        db = TestingSessionLocal()
-        yield db
-    finally:
-        db.close()
-
-
-app.dependency_overrides[get_db] = override_get_db
+def override_get_db(dbsession):
+    def _override_get_db():
+        yield dbsession
+    return _override_get_db
 
 client = TestClient(app)
 
-
 @pytest.fixture(autouse=True)
 def mock_s3_bucket():
-    with mock_aws():
-        s3 = boto3.client("s3", region_name="us-east-1")
-        s3.create_bucket(Bucket="test-bucket")
+    with patch("boto3.client") as mock_boto_client:
+        mock_s3 = mock_boto_client.return_value
+        mock_s3.create_bucket.return_value = None
+        mock_s3.generate_presigned_url.return_value = "http://test-url.com"
         yield
+
+
+@pytest.fixture(autouse=True)
+def override_get_db_fixture(dbsession):
+    app.dependency_overrides[get_db] = override_get_db(dbsession)
+    yield
+    app.dependency_overrides.pop(get_db, None)
 
 
 @patch("pika.BlockingConnection")

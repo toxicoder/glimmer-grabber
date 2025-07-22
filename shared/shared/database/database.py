@@ -1,8 +1,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from shared.config import settings
+from shared.config import get_settings
 
-if settings.TESTING:
+settings = get_settings()
+
+if settings.testing:
     engine = create_engine("sqlite:///./test.db", connect_args={"check_same_thread": False})
 else:
     engine = create_engine(settings.DATABASE_URL)

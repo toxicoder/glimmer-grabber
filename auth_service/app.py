@@ -10,7 +10,9 @@ from shared.shared.database.database import get_db, engine
 from shared.shared.models.models import User, Base
 from shared.shared.schemas.schemas import UserCreate, User as UserSchema, Token, UserLogin
 from . import utils, security
-from .config import settings
+from .config import get_settings
+
+settings = get_settings()
 
 app = FastAPI()
 
@@ -41,7 +43,7 @@ def login(user_credentials: UserLogin, db: Session = Depends(get_db)) -> Token:
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
     access_token = security.create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
@@ -57,7 +59,7 @@ def login_for_access_token(form_data: security.OAuth2PasswordRequestForm = Depen
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
     access_token = security.create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
