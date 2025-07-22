@@ -1,11 +1,13 @@
 import redis
 import requests
 import json
-from shared.config import settings
+from shared.config import get_settings
+
+settings = get_settings()
 
 class CardDataFetcher:
     def __init__(self) -> None:
-        self.redis_client = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0)
+        self.redis_client = redis.Redis(host=settings.redis_host, port=settings.redis_port, db=0)
 
     def get_card_details(self, card_name: str) -> dict:
         """
@@ -21,16 +23,15 @@ class CardDataFetcher:
             pass
 
         try:
-            response = requests.get(f"{settings.LORCANA_API_URL}/cards/{card_name}")
+            response = requests.get(f"{settings.lorcana_api_url}/cards/{card_name}")
             response.raise_for_status()
             card_details = response.json()
-
-            try:
-                self.redis_client.set(card_name, json.dumps(card_details))
-            except redis.exceptions.RedisError as e:
-                print(f"Redis error: {e}")
-
+            if response.status_code == 200 and card_details:
+                try:
+                    self.redis_client.set(card_name, json.dumps(card_details))
+                except redis.exceptions.RedisError as e:
+                    print(f"Redis error: {e}")
             return card_details
         except requests.exceptions.RequestException as e:
             print(f"Error calling Lorcana API: {e}")
-            return {}
+            return None

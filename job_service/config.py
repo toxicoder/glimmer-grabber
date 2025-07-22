@@ -1,10 +1,4 @@
-from pydantic_settings import BaseSettings
+from shared.config import Settings
 
-class Settings(BaseSettings):
-    SECRET_KEY: str = "a_very_secret_key"
-    ALGORITHM: str = "HS256"
-
-    class Config:
-        env_file = ".env"
-
-settings = Settings()
+def get_settings():
+    return Settings()

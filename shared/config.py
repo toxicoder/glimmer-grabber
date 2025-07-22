@@ -1,26 +1,25 @@
 from pydantic_settings import BaseSettings
-from dotenv import load_dotenv
-
-load_dotenv()
 
 class Settings(BaseSettings):
-    S3_BUCKET_NAME: str
-    S3_REGION: str
-    MINIO_ENDPOINT: str
-    MINIO_ACCESS_KEY: str
-    MINIO_SECRET_KEY: str
-    TESTING: bool = False
-    RABBITMQ_HOST: str = "localhost"
-    RABBITMQ_QUEUE: str = "test_queue"
-    SECRET_KEY: str
-    ALGORITHM: str
-    DATABASE_URL: str = "postgresql://user:password@postgres/database"
-    LORCANA_API_URL: str
-    REDIS_HOST: str = "localhost"
-    REDIS_PORT: int = 6379
+    s3_bucket_name: str
+    s3_region: str
+    minio_endpoint: str
+    minio_access_key: str
+    minio_secret_key: str
+    lorcana_api_url: str
+    database_url: str
+    rabbitmq_host: str
+    rabbitmq_queue: str
+    testing: bool = False
+    rabbitmq_url: str
+    redis_host: str
+    redis_port: int
+    secret_key: str = "a_very_secret_key"
+    algorithm: str = "HS256"
+    access_token_expire_minutes: int = 30
 
     class Config:
         env_file = ".env"
-        env_file_encoding = 'utf-8'
 
-settings = Settings()
+def get_settings():
+    return Settings()

@@ -8,3 +8,5 @@ celery
 boto3
 opencv-python
 pytesseract
+fuzzywuzzy
+python-Levenshtein

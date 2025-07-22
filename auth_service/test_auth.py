@@ -1,7 +1,5 @@
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from unittest.mock import patch
 import sys
 import os
@@ -9,34 +7,19 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..',
 from auth_service.app import app, get_db
 from shared.shared.models.models import Base, User
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-
-Base.metadata.create_all(bind=engine)
-
-
-def override_get_db():
-    try:
-        db = TestingSessionLocal()
-        yield db
-    finally:
-        db.close()
-
-
-app.dependency_overrides[get_db] = override_get_db
+def override_get_db(dbsession):
+    def _override_get_db():
+        yield dbsession
+    return _override_get_db
 
 client = TestClient(app)
 
 @pytest.fixture(autouse=True)
-def setup_db():
-    Base.metadata.create_all(bind=engine)
+def override_get_db_fixture(dbsession):
+    app.dependency_overrides[get_db] = override_get_db(dbsession)
     yield
-    Base.metadata.drop_all(bind=engine)
+    app.dependency_overrides.pop(get_db, None)
 
 
 def test_register():

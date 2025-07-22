@@ -2,7 +2,9 @@ import boto3
 import requests
 import hashlib
 from shared.shared.models.models import ProcessedImage
-from shared.config import settings
+from shared.config import get_settings
+
+settings = get_settings()
 
 def download_image_from_s3(image_key: str) -> bytes:
     """

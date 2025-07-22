@@ -7,7 +7,9 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from . import utils
-from .config import settings
+from .config import get_settings
+
+settings = get_settings()
 from shared.shared.models.models import User
 from shared.shared.schemas.schemas import TokenData
 from shared.shared.database.database import get_db
@@ -21,7 +23,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
     return encoded_jwt
 
 def authenticate_user_by_email(db: Session, email: str, password: str) -> Optional[User]:
