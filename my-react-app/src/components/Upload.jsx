@@ -40,7 +40,8 @@ const Upload = () => {
     <div>
       <h1>Upload Image</h1>
       <form onSubmit={handleSubmit}>
-        <input type="file" onChange={handleFileChange} />
+        <label htmlFor="file">Select a file</label>
+        <input type="file" id="file" onChange={handleFileChange} />
         <button type="submit">Upload</button>
       </form>
     </div>

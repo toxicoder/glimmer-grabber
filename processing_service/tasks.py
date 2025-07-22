@@ -7,7 +7,7 @@ from .core.data_extraction import extract_data
 from .utils.logging_utils import setup_logging
 from .utils.file_utils import download_image_from_s3, is_image_processed
 from .database import get_db, ProcessingJob, Card
-from shared.models.models import ProcessedImage
+from shared.shared.models.models import ProcessedImage
 
 logger = setup_logging()
 

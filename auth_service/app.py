@@ -2,17 +2,18 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, APIRouter
 from sqlalchemy.orm import Session
 from datetime import timedelta
 
-from shared.database.database import get_db, engine
-from shared.models.models import User, Base
-from shared.schemas.schemas import UserCreate, User as UserSchema, Token, UserLogin
+from shared.shared.database.database import get_db, engine
+from shared.shared.models.models import User, Base
+from shared.shared.schemas.schemas import UserCreate, User as UserSchema, Token, UserLogin
 from . import utils, security
 from .config import settings
 
 app = FastAPI()
+
 
 Base.metadata.create_all(bind=engine)
 

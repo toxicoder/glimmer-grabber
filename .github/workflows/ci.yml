@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r job_service/requirements.txt
+        pip install -r processing_service/requirements.txt
+        pip install -r auth_service/requirements.txt
+        pip install pytest moto passlib python-multipart fuzzywuzzy text-encoding
+        pip install -e shared
+        sudo apt-get update && sudo apt-get install -y tesseract-ocr
+
+    - name: Run Python tests
+      run: |
+        ./run_tests.sh
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+
+    - name: Install frontend dependencies
+      run: npm install --prefix my-react-app
+
+    - name: Run frontend tests
+      run: npm test --prefix my-react-app

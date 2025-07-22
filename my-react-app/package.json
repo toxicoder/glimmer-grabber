@@ -11,13 +11,18 @@
     "test": "jest"
   },
   "dependencies": {
+    "@babel/preset-env": "^7.28.0",
+    "@babel/preset-react": "^7.27.1",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "axios": "^1.10.0",
+    "babel-jest": "^30.0.4",
     "jest": "^30.0.4",
+    "jest-environment-jsdom": "^30.0.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-router-dom": "^7.7.0"
+    "react-router-dom": "^7.7.0",
+    "text-encoding": "^0.7.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.31.0",

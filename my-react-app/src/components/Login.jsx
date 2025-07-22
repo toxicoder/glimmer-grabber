@@ -22,15 +22,19 @@ const Login = () => {
     <div>
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
+        <label htmlFor="email">Username</label>
         <input
           type="email"
+          id="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
           required
         />
+        <label htmlFor="password">Password</label>
         <input
           type="password"
+          id="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
