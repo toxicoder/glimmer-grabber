@@ -8,9 +8,9 @@ from sqlalchemy.orm import Session
 
 from . import utils
 from .config import settings
-from shared.models.models import User
-from shared.schemas.schemas import TokenData
-from shared.database.database import get_db
+from shared.shared.models.models import User
+from shared.shared.schemas.schemas import TokenData
+from shared.shared.database.database import get_db
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 

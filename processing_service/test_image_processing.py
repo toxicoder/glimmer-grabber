@@ -1,8 +1,11 @@
 import unittest
 import hashlib
 from unittest.mock import patch, MagicMock
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from processing_service.tasks import process_image_task
-from shared.models.models import ProcessingJob, ProcessedImage, Base
+from shared.shared.models.models import ProcessingJob, ProcessedImage, Base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
