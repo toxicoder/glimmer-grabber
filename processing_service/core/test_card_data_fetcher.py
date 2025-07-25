@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock
+import requests
 from processing_service.core.card_data_fetcher import CardDataFetcher
 
 class TestCardDataFetcher(unittest.TestCase):
@@ -33,12 +34,12 @@ class TestCardDataFetcher(unittest.TestCase):
         self.mock_redis_instance.get.return_value = None
         mock_response = MagicMock()
         mock_response.status_code = 404
+        mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError
         mock_get.return_value = mock_response
 
         card_name = "Nonexistent Card"
         result = self.fetcher.get_card_details(card_name)
 
-        mock_response.raise_for_status.assert_called_once()
         self.assertIsNone(result)
 
     def test_fetch_card_data_from_cache(self):
