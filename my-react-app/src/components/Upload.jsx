@@ -4,6 +4,7 @@ import api from '../utils/api';
 
 const Upload = () => {
   const [file, setFile] = useState(null);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const handleFileChange = (e) => {
@@ -18,10 +19,13 @@ const Upload = () => {
     }
 
     try {
-      const response = await api.post('/jobs');
-      const { upload_url, job_id } = response.data;
+      const response = await api.post('/jobs', {
+        filename: file.name,
+        contentType: file.type,
+      });
+      const { uploadUrl, jobId } = response.data;
 
-      await fetch(upload_url, {
+      await fetch(uploadUrl, {
         method: 'PUT',
         body: file,
         headers: {
@@ -29,16 +33,17 @@ const Upload = () => {
         },
       });
 
-      navigate(`/jobs/${job_id}`);
+      navigate(`/jobs/${jobId}`);
     } catch (error) {
       console.error('Error uploading file:', error);
-      alert('Error uploading file');
+      setError(error.response?.data?.detail || 'Error uploading file');
     }
   };
 
   return (
     <div>
       <h1>Upload Image</h1>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
       <form onSubmit={handleSubmit}>
         <label htmlFor="file">Select a file</label>
         <input type="file" id="file" onChange={handleFileChange} />
