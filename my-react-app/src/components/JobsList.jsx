@@ -27,6 +27,11 @@ const JobsList = () => {
             <Link to={`/jobs/${job.id}`}>
               Job {job.id} - {job.status}
             </Link>
+            {job.status === 'completed' && (
+              <Link to={`/jobs/${job.id}/result`} style={{ marginLeft: '10px' }}>
+                View Result
+              </Link>
+            )}
           </li>
         ))}
       </ul>

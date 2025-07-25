@@ -9,6 +9,7 @@ import Upload from './components/Upload';
 import JobStatus from './components/JobStatus';
 import JobsList from './components/JobsList';
 import Collection from './components/Collection';
+import JobResult from './pages/JobResult';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/upload" element={<Upload />} />
         <Route path="/jobs/:jobId" element={<JobStatus />} />
+        <Route path="/jobs/:jobId/result" element={<JobResult />} />
         <Route path="/jobs" element={<JobsList />} />
         <Route path="/collection" element={<Collection />} />
       </Route>
