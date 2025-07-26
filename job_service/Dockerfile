@@ -10,7 +10,7 @@ RUN pip install -r requirements.txt
 COPY job_service/ .
 
 # Install the shared module
-COPY shared /tmp/shared
+COPY ./shared /tmp/shared
 RUN pip install /tmp/shared
 
 CMD ["python", "app.py"]

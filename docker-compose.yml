@@ -24,8 +24,8 @@ services:
   # Authentication Service
   auth_service:
     build:
-      context: ./auth_service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: auth_service/Dockerfile
     depends_on:
       - consul
       - postgres_auth
@@ -55,10 +55,10 @@ services:
   # Frontend
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: frontend/Dockerfile
     ports:
-      - "3000:3000"
+      - "3000:80"
     depends_on:
       - api_gateway
 
