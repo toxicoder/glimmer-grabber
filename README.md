@@ -159,8 +159,8 @@ To get started with this project, you will need to have Docker and Docker Compos
 1.  **Clone the repository:**
 
     ```bash
-    git clone https://github.com/your-username/your-repository.git
-    cd your-repository
+    git clone https://github.com/toxicoder/glimmer-grabber
+    cd glimmer-grabber
     ```
 
 2.  **Create a `.env` file:**
