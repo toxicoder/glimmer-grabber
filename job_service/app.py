@@ -8,8 +8,8 @@ import uuid
 import logging
 from cachetools import cached, TTLCache
 
-from shared.shared.database.database import get_db, engine
-from shared.shared.models.models import ProcessingJob, Card, Base
+from shared.database.database import get_db, engine
+from shared.models.models import ProcessingJob, Card, Base
 from shared.config import get_settings
 
 settings = get_settings()

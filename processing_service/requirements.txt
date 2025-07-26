@@ -10,3 +10,4 @@ opencv-python
 pytesseract
 fuzzywuzzy
 python-Levenshtein
+sqlalchemy
