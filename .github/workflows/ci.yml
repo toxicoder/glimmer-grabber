@@ -24,7 +24,7 @@ jobs:
         pip install -r job_service/requirements.txt
         pip install -r processing_service/requirements.txt
         pip install -r auth_service/requirements.txt
-        pip install pytest moto passlib python-multipart fuzzywuzzy text-encoding
+        pip install pytest moto passlib python-multipart fuzzywuzzy
         pip install -e shared
         sudo apt-get update && sudo apt-get install -y tesseract-ocr
 
